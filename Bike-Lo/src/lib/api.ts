@@ -4,7 +4,7 @@
  */
 export const API_BASE =
   (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_URL) ||
-  "https://seattle-challenging-analysts-guaranteed.trycloudflare.com/";
+  "https://letter-keeping-subjects-eva.trycloudflare.com/";
 
 const ACCESS_TOKEN_KEY = "bikelo_access_token";
 const REFRESH_TOKEN_KEY = "bikelo_refresh_token";

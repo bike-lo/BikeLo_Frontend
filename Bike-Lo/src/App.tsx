@@ -19,19 +19,21 @@ import Admin from '@/pages/Admin'
 import AdminAddBike from '@/pages/AdminAddBike'
 import AdminUsers from '@/pages/AdminUsers'
 import BikeDetails from '@/pages/BikeDetails'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import '@/App.css'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 function App() {
   const location = useLocation();
-  const hideFooterRoutes = ['/login', '/signup'];
-  const shouldShowFooter = !hideFooterRoutes.includes(location.pathname);
+  const shouldShowFooter = location.pathname === '/' || location.pathname === '/about';
+  const isBikeDetails = location.pathname.startsWith('/buy/') && location.pathname.length > 5;
+  const shouldShowNavbar = !isBikeDetails;
 
   return (
     <ThemeProvider>
       <AuthProvider>
         <BackgroundComponents>
-          <Navbar />
+          {shouldShowNavbar && <Navbar />}
           <main className="min-h-screen">
             <ErrorBoundary>
               <Routes>
@@ -39,17 +41,17 @@ function App() {
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />
                 <Route path="/verify-otp" element={<VerifyOTP />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/bikes" element={<Bikes />} />
-                <Route path="/buy" element={<Buy />} />
-                <Route path="/sell" element={<Sell />} />
-                <Route path="/service" element={<Service />} />
-                <Route path="/parts" element={<Parts />} />
+                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                <Route path="/bikes" element={<ProtectedRoute><Bikes /></ProtectedRoute>} />
+                <Route path="/buy" element={<ProtectedRoute><Buy /></ProtectedRoute>} />
+                <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
+                <Route path="/service" element={<ProtectedRoute><Service /></ProtectedRoute>} />
+                <Route path="/parts" element={<ProtectedRoute><Parts /></ProtectedRoute>} />
                 <Route path="/about" element={<About />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/admin/add-bike" element={<AdminAddBike />} />
-                <Route path="/admin/users" element={<AdminUsers />} />
-                <Route path="/buy/:id" element={<BikeDetails />} />
+                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                <Route path="/admin/add-bike" element={<ProtectedRoute><AdminAddBike /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
+                <Route path="/buy/:id" element={<ProtectedRoute><BikeDetails /></ProtectedRoute>} />
               </Routes>
             </ErrorBoundary>
           </main>

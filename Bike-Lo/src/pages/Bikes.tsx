@@ -97,7 +97,7 @@ export default function Bikes() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-transparent pt-16 lg:pt-20">
       {/* Header */}
       <div className="bg-transparent border-b border-gray-200 py-6">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

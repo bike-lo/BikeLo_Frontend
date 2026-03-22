@@ -1,0 +1,179 @@
+/* ============================================================
+   BIKELO — MOBILE RESPONSIVENESS
+   Breakpoints used:
+     xs  : < 400px  (very small phones)
+     sm  : < 640px  (most phones in portrait)
+     md  : < 768px  (large phones / small tablets in portrait)
+   ============================================================ */
+
+/* ── 1. Global — prevent horizontal scroll ──────────────────── */
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ── 2. Tap-target minimum size (WCAG 2.5.5) ───────────────── */
+@media (max-width: 768px) {
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Allow small inline anchors (e.g. "Sign up" text links) to bypass */
+  a.inline-link {
+    min-height: unset;
+    min-width: unset;
+  }
+}
+
+/* ── 3. Navbar logo ─────────────────────────────────────────── */
+@media (max-width: 400px) {
+  nav img.h-25 {
+    height: 4rem;
+  }
+}
+
+/* ── 4. Hero Section ────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Make the animated title wrap nicely */
+  .hero-section h1 {
+    font-size: clamp(1.75rem, 8vw, 3rem);
+    line-height: 1.2;
+  }
+
+  /* Reduce hero image container on very small phones */
+  .hero-section .relative.h-\[300px\] {
+    height: 220px;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-section h1 {
+    font-size: 1.6rem;
+  }
+}
+
+/* ── 5. Browse Bikes (Bikes page) ───────────────────────────── */
+@media (max-width: 768px) {
+  /* Ensure the fixed navbar doesn't overlap the page header */
+  .browse-bikes-header {
+    padding-top: 5rem; /* 80px = navbar height */
+  }
+}
+
+/* ── 6. Bike Grid — single column on xs ────────────────────── */
+@media (max-width: 400px) {
+  .bike-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 7. Profile Page ────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Profile header: stack avatar + info + logout vertically */
+  .profile-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .profile-header-row .logout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Profile card padding reduction */
+  .profile-card {
+    padding: 1.25rem;
+  }
+}
+
+/* ── 8. Auth Page ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* The card takes full height on mobile */
+  .auth-card {
+    min-height: unset;
+  }
+}
+
+/* ── 9. Footer tweaks ───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .footer-content {
+    padding: 32px 12px 24px;
+  }
+
+  .footer-logo-text {
+    font-size: 1.75rem;
+  }
+
+  .footer-links-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .footer-cta {
+    flex-direction: column;
+  }
+
+  .cta-call,
+  .cta-outline {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── 10. BuySellSection — benefits grid on small phones ──────── */
+@media (max-width: 400px) {
+  .buy-sell-section .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 11. PremiumServices — cards on small phones ─────────────── */
+@media (max-width: 400px) {
+  .premium-services .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 12. BrowseByStyle — 2-col on small, 1-col on xs ─────────── */
+@media (max-width: 400px) {
+  .browse-by-style .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 13. BikeDetails page ─────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* CTA buttons full-width on mobile */
+  .bike-details-cta {
+    flex-direction: column;
+  }
+
+  .bike-details-cta button {
+    width: 100%;
+  }
+}
+
+/* ── 14. Forms — full-width inputs on mobile ──────────────────── */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+  }
+}
+
+/* ── 15. Sell page — card padding ─────────────────────────────── */
+@media (max-width: 640px) {
+  .sell-page-card .card-content {
+    padding: 1rem;
+  }
+}

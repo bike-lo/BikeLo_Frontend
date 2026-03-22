@@ -206,7 +206,7 @@ export default function Auth() {
             </motion.div>
 
             {/* ── Left Column: Sign In Form ── */}
-            <CardContent className="flex flex-col justify-center p-8 md:p-10 bg-[var(--card)]">
+            <CardContent className={`flex-col justify-center p-8 md:p-10 bg-[var(--card)] ${isSignUp ? 'hidden md:flex' : 'flex'}`}>
               <motion.div
                 key="signin-form"
                 variants={formVariants}
@@ -308,7 +308,7 @@ export default function Auth() {
             </CardContent>
 
             {/* ── Right Column: Sign Up Form (desktop only) ── */}
-            <CardContent className="hidden md:flex flex-col justify-center p-8 md:p-10 bg-[var(--card)]">
+            <CardContent className={`flex-col justify-center p-8 md:p-10 bg-[var(--card)] ${isSignUp ? 'flex' : 'hidden md:flex'}`}>
               <motion.div
                 key="signup-form-right"
                 variants={formVariants}

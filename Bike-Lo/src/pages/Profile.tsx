@@ -102,8 +102,8 @@ export default function Profile() {
         {/* Profile Card */}
         <div className="bg-card border border-border rounded-xl p-8 shadow-lg">
           {/* Profile Header */}
-          <div className="flex items-center gap-6 mb-8 pb-8 border-b border-border">
-            <div className="w-20 h-20 rounded-full bg-[#f7931e] flex items-center justify-center">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-8 pb-8 border-b border-border text-center sm:text-left">
+            <div className="w-20 h-20 rounded-full bg-[#f7931e] flex items-center justify-center flex-shrink-0">
               <User className="w-10 h-10 text-white" />
             </div>
             <div className="flex-1">
@@ -113,12 +113,12 @@ export default function Profile() {
               >
                 {name}
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
+              <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center sm:justify-start gap-2">
                 <Mail className="w-4 h-4" />
                 {email}
               </p>
               {phone && (
-                <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-2">
+                <p className="text-gray-600 dark:text-gray-400 flex items-center justify-center sm:justify-start gap-2 mt-2">
                   <span className="text-sm">📞</span>
                   {phone}
                 </p>
@@ -127,7 +127,7 @@ export default function Profile() {
             <Button
               variant="outline"
               onClick={handleLogout}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto mt-4 sm:mt-0"
               style={{ fontFamily: "'Noto Serif', serif" }}
             >
               <LogOut className="w-4 h-4" />

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import mock3 from "@/assets/Hero-Image.webp";
+import { Link } from "react-router-dom";
 
 export default function Hero() {
   const [titleNumber, setTitleNumber] = useState(0);
@@ -25,7 +26,7 @@ export default function Hero() {
   // Tile hover color based on theme
 
   return (
-    <section 
+    <section
       className="hero-section relative pt-10 sm:pt-20 lg:pt-24 pb-8 sm:pb-10 lg:pb-12 px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
 
@@ -37,7 +38,7 @@ export default function Hero() {
             {/* Heading */}
             <div className="space-y-4">
               <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight overflow-hidden text-black dark:text-white">
-                <motion.span 
+                <motion.span
                   className="block"
                   style={{ fontFamily: "'Noto Serif', serif" }}
                   initial={{ opacity: 0, y: 40 }}
@@ -46,7 +47,7 @@ export default function Hero() {
                 >
                   Your Dream Bike,
                 </motion.span>
-                <motion.span 
+                <motion.span
                   className="block"
                   style={{ fontFamily: "'Noto Serif', serif" }}
                   initial={{ opacity: 0, y: 40 }}
@@ -56,28 +57,28 @@ export default function Hero() {
                   <span className="hero-highlight">Deliver</span> to
                 </motion.span>
                 {/* Animated Rotating Text with "Your" prefix */}
-                <span 
-                  className="relative flex w-full justify-center lg:justify-start items-center overflow-hidden h-[1.2em] md:h-[1.15em]"
+                <span
+                  className="relative flex justify-center lg:justify-start items-center w-full h-[1.2em] md:h-[1.15em]"
                   style={{ fontFamily: "'Noto Serif', serif" }}
                 >
-                  <span className="text-black dark:text-white mr-2">Your</span>
-                  <span className="relative flex-1 overflow-hidden h-full">
+                  <span className="text-black dark:text-white mr-2 md:mr-3">Your</span>
+                  <span className="relative overflow-hidden h-full w-[4.5em] sm:w-[5.5em] text-left">
                     {titles.map((title, index) => (
                       <motion.span
                         key={index}
-                        className="absolute text-[#f7931e]"
+                        className="absolute text-[#f7931e] top-0 left-0"
                         initial={{ opacity: 0, y: 100 }}
                         transition={{ type: "spring", stiffness: 50, damping: 20 }}
                         animate={
                           titleNumber === index
                             ? {
-                                y: 0,
-                                opacity: 1,
-                              }
+                              y: 0,
+                              opacity: 1,
+                            }
                             : {
-                                y: titleNumber > index ? -100 : 100,
-                                opacity: 0,
-                              }
+                              y: titleNumber > index ? -100 : 100,
+                              opacity: 0,
+                            }
                         }
                       >
                         {title}
@@ -89,30 +90,32 @@ export default function Hero() {
             </div>
 
             {/* Subheading */}
-            <motion.p 
+            <motion.p
               className="text-base sm:text-xl text-gray-600 dark:text-gray-300 max-w-xl mx-auto lg:mx-0"
               style={{ fontFamily: "'Noto Serif', serif" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.5, ease: 'easeInOut' }}
             >
-              Buy, sell & service pre-owned bikes with trust. 
+              Buy, sell & service pre-owned bikes with trust.
               <span className="text-[#f7931e] font-semibold"> 10,000+ certified bikes</span> waiting for you.
             </motion.p>
 
             {/* Primary CTA Buttons */}
-            <motion.div 
+            <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.65, ease: 'easeInOut' }}
             >
-              <Button
-                className="hero-btn bg-[#f7931e] hover:bg-[#e6851a] text-white font-bold px-8 py-6 text-lg rounded-md hover:scale-105 transition-transform duration-300"
-                style={{ fontFamily: "'Noto Serif', serif" }}
-              >
-                Contact Us
-              </Button>
+              <Link to="/buy">
+                <Button
+                  className="hero-btn bg-[#f7931e] hover:bg-[#e6851a] text-white font-bold px-8 py-6 text-lg rounded-md hover:scale-105 transition-transform duration-300"
+                  style={{ fontFamily: "'Noto Serif', serif" }}
+                >
+                  Explore Bikes
+                </Button>
+              </Link>
               <Button
                 className="hero-btn bg-[#f7931e] hover:bg-[#e6851a] text-white font-bold px-8 py-6 text-lg rounded-md hover:scale-105 transition-transform duration-300"
                 style={{ fontFamily: "'Noto Serif', serif" }}
@@ -122,7 +125,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Social Proof Section */}
-            <motion.div 
+            <motion.div
               className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -136,9 +139,9 @@ export default function Hero() {
                     className="w-10 h-10 rounded-full bg-[#f7931e] border-2 border-white"
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ 
-                      duration: 0.4, 
-                      delay: 0.9 + i * 0.1, 
+                    transition={{
+                      duration: 0.4,
+                      delay: 0.9 + i * 0.1,
                       type: "spring",
                       stiffness: 200,
                       damping: 15
@@ -146,7 +149,7 @@ export default function Hero() {
                   />
                 ))}
               </div>
-              
+
               {/* Rating and Review Text */}
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
@@ -155,8 +158,8 @@ export default function Hero() {
                       key={i}
                       initial={{ opacity: 0, scale: 0, rotate: -180 }}
                       animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                      transition={{ 
-                        duration: 0.5, 
+                      transition={{
+                        duration: 0.5,
                         delay: 1 + i * 0.08,
                         type: "spring",
                         stiffness: 200,
@@ -176,7 +179,7 @@ export default function Hero() {
           </div>
 
           {/* Right Column: Static Image */}
-          <motion.div 
+          <motion.div
             className="flex justify-center lg:justify-end items-center"
             initial={{ opacity: 0, x: 60, scale: 0.95 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}

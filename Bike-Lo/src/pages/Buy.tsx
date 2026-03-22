@@ -101,23 +101,24 @@ export default function Buy() {
   };
 
   return (
-    <div className="flex min-h-screen pt-16">
-      {/* Sidebar — sticky, full height (desktop only; mobile uses Sheet) */}
-      <div className="hidden lg:block flex-shrink-0 px-4 sm:px-6 py-8">
-        <FilterSidebar
-          priceRange={priceRange}
-          onPriceRangeChange={setPriceRange}
-          selectedBrands={selectedBrands}
-          onBrandsChange={setSelectedBrands}
-          selectedYear={selectedYear}
-          onYearChange={setSelectedYear}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-      </div>
+    <div className="flex justify-center min-h-screen pt-16 bg-transparent">
+      <div className="flex w-full max-w-[1600px] lg:gap-6 px-4 sm:px-6 lg:px-8">
+        {/* Sidebar — sticky, full height (desktop only; mobile uses Sheet) */}
+        <div className="hidden lg:block flex-shrink-0 py-8">
+          <FilterSidebar
+            priceRange={priceRange}
+            onPriceRangeChange={setPriceRange}
+            selectedBrands={selectedBrands}
+            onBrandsChange={setSelectedBrands}
+            selectedYear={selectedYear}
+            onYearChange={setSelectedYear}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+        </div>
 
-      {/* Main content */}
-      <div className="flex-1 px-4 sm:px-6 lg:px-10 py-8 space-y-10 overflow-y-auto">
+        {/* Main content */}
+        <div className="flex-1 py-8 space-y-10 overflow-y-auto min-w-0">
         {/* Mobile filter trigger */}
         <div className="block lg:hidden">
           <FilterSidebar
@@ -144,5 +145,6 @@ export default function Buy() {
         <BenefitsSection />
       </div>
     </div>
+  </div>
   );
 }

@@ -129,12 +129,12 @@ export async function updateUserRoleApi(userId: number, payload: UpdateRoleReque
 
 export { getRefreshToken, setTokens, clearTokens };
 
-/** Legacy/optional: verify OTP via external webhook (used by VerifyOTP page). */
+/** Verify new user OTP. */
 export async function verifyOtpApi(email: string, otp: string): Promise<string> {
-  const res = await fetch("https://n8n.ch-varun.xyz/webhook/verify-otp", {
+  const res = await fetch(`${API_BASE}/auth/verify-otp`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, otp }),
+    body: JSON.stringify({ email, "verify-otp": otp }),
   });
   const text = await res.text();
   if (!res.ok) throw new Error(text || "OTP verification failed");

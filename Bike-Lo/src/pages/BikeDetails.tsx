@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getBikes, bikeImageUrl, updateBike } from "@/services/bikeService";
+import { getBikes, bikeImageUrl, updateBike, bookBikeLeadApi } from "@/services/bikeService";
 import type { BikeResponse, UpdateBikeRequest } from "@/types/api";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Pencil, Save, X, Trash2, Plus } from "lucide-react";
@@ -25,6 +25,7 @@ export default function BikeDetails() {
   // Edit Mode State
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isBooking, setIsBooking] = useState(false);
   const [editData, setEditData] = useState<Partial<UpdateBikeRequest>>({});
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
@@ -161,7 +162,78 @@ export default function BikeDetails() {
     }
   };
 
+  const handleBookNow = async () => {
+    if (!user) {
+      toast.error("Please login to book a bike.");
+      navigate("/login");
+      return;
+    }
+    if (!bike) return;
+
+    setIsBooking(true);
+    try {
+      const subject = `Booking Request: ${displayBike.make} ${displayBike.model_name}`;
+      
+      const userHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; border-radius: 8px;">
+          <h2 style="color: #f7931e;">Booking Confirmation</h2>
+          <p>Hi <strong>${user.name || 'Customer'}</strong>,</p>
+          <p>Thank you for expressing your interest in the <strong>${displayBike.year} ${displayBike.make} ${displayBike.model_name}</strong>!</p>
+          <div style="background-color: white; padding: 15px; border-radius: 6px; border: 1px solid #eee; margin: 15px 0;">
+            <p style="margin: 5px 0;"><strong>Price:</strong> ${formatPrice(displayBike.price)}</p>
+            <p style="margin: 5px 0;"><strong>KM Driven:</strong> ${displayBike.km_driven?.toLocaleString("en-IN") || 0} km</p>
+          </div>
+          <p>We have successfully received your request and our team will contact you shortly to arrange a viewing and test ride.</p>
+          <br>
+          <p>Best Regards,</p>
+          <p><strong>BikeLo Team</strong></p>
+        </div>
+      `;
+
+      const adminHtml = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; background-color: #f4f4f4; border-radius: 8px;">
+          <h2 style="color: #d9534f;">New Bike Booking Lead</h2>
+          
+          <div style="background-color: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 15px;">
+            <h3 style="margin-top: 0; color: #333;">Customer Details</h3>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 8px;"><strong>Name:</strong> ${user.name || 'Unknown'}</li>
+              <li style="margin-bottom: 8px;"><strong>Email:</strong> ${user.email}</li>
+              <li style="margin-bottom: 8px;"><strong>Phone:</strong> ${user.phone || 'Not provided'}</li>
+              <li style="margin-bottom: 8px;"><strong>User ID:</strong> ${user.id}</li>
+            </ul>
+          </div>
+
+          <div style="background-color: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+            <h3 style="margin-top: 0; color: #333;">Bike Details</h3>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+              <li style="margin-bottom: 8px;"><strong>Bike ID:</strong> ${bike.id}</li>
+              <li style="margin-bottom: 8px;"><strong>Make:</strong> ${displayBike.make}</li>
+              <li style="margin-bottom: 8px;"><strong>Model:</strong> ${displayBike.model_name}</li>
+              <li style="margin-bottom: 8px;"><strong>Year:</strong> ${displayBike.year}</li>
+              <li style="margin-bottom: 8px;"><strong>Price:</strong> ${formatPrice(displayBike.price)}</li>
+            </ul>
+          </div>
+        </div>
+      `;
+
+      await bookBikeLeadApi({
+        email: user.email,
+        subject,
+        "UserHTML ": userHtml,
+        "AdminHTML ": adminHtml
+      });
+
+      toast.success("Booking request sent successfully! We will contact you soon.");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit your request.");
+    } finally {
+      setIsBooking(false);
+    }
+  };
+
   // ── Loading & Errors ───────────────────────────────────────────────────────
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center pt-20">
@@ -385,8 +457,13 @@ export default function BikeDetails() {
           {/* CTA & Features (Hide in edit mode optionally, or keep unchanged) */}
           <div className={`transition-opacity ${isEditing ? 'opacity-50 pointer-events-none' : ''}`}>
             <div className="flex flex-col sm:flex-row gap-3">
-              <button className="flex-1 py-4 bg-gradient-to-r from-[#f7931e] to-[#e6851a] text-white font-black uppercase tracking-widest text-sm rounded-xl shadow-lg shadow-orange-500/20" style={{ fontFamily: "'Noto Serif', serif" }}>
-                Book Now
+              <button 
+                onClick={handleBookNow}
+                disabled={isBooking}
+                className="flex-1 py-4 bg-gradient-to-r from-[#f7931e] to-[#e6851a] text-white font-black uppercase tracking-widest text-sm rounded-xl shadow-lg shadow-orange-500/20 disabled:opacity-50 transition-all" 
+                style={{ fontFamily: "'Noto Serif', serif" }}
+              >
+                {isBooking ? "Booking..." : "Book Now"}
               </button>
               <button className="flex-1 py-4 bg-transparent border-2 border-neutral-300 dark:border-neutral-700 text-black dark:text-white font-bold uppercase tracking-widest text-sm rounded-xl" style={{ fontFamily: "'Noto Serif', serif" }}>
                 Check On-Road Price

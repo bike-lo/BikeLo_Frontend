@@ -13,6 +13,7 @@ import Service from '@/pages/Service'
 import Parts from '@/pages/Parts'
 import About from '@/pages/About'
 import Auth from '@/pages/Auth'
+import ForgotPassword from '@/pages/ForgotPassword'
 import Profile from '@/pages/Profile'
 import VerifyOTP from '@/pages/VerifyOTP'
 import Admin from '@/pages/Admin'
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Auth />} />
                 <Route path="/signup" element={<Auth />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/verify-otp" element={<VerifyOTP />} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/bikes" element={<ProtectedRoute><Bikes /></ProtectedRoute>} />

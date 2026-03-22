@@ -76,7 +76,7 @@ export default function Auth() {
     setIsLoading(true);
     try {
       await signup(name, email, password, phone);
-      navigate('/');
+      navigate('/verify-otp', { state: { email } });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
@@ -273,6 +273,7 @@ export default function Auth() {
                   <motion.div className="text-right" variants={itemVariants}>
                     <button
                       type="button"
+                      onClick={() => navigate('/forgot-password')}
                       className="text-sm text-muted-foreground hover:text-[#f7931e] transition-colors"
                     >
                       Forgot Password?

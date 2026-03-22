@@ -8,7 +8,7 @@ import { verifyOtpApi } from '@/services/authService';
 export default function VerifyOTP() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { verify } = useAuth();
+  const { verify, user } = useAuth();
   const [digits, setDigits] = useState<string[]>(new Array(6).fill(''));
   const inputsRef = useRef<HTMLInputElement[]>([]);
   const [error, setError] = useState('');
@@ -16,7 +16,7 @@ export default function VerifyOTP() {
   const [resendTimer, setResendTimer] = useState<number>(60);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const email = (location.state as any)?.email || '';
+  const email = (location.state as any)?.email || user?.email || '';
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();

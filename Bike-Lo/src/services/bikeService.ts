@@ -86,3 +86,23 @@ export async function deleteBike(bikeId: number): Promise<void> {
     throw new Error((detail as any)?.detail ?? text);
   }
 }
+
+export interface BookBikeLeadPayload {
+  email: string;
+  subject: string;
+  "UserHTML ": string;
+  "AdminHTML ": string;
+}
+
+export async function bookBikeLeadApi(payload: BookBikeLeadPayload): Promise<unknown> {
+  const res = await fetch(`${API_BASE}/leads/capture`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to submit booking lead");
+  }
+  return res.json().catch(() => ({}));
+}

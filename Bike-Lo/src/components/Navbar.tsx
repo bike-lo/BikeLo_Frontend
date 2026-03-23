@@ -55,7 +55,6 @@ export default function Navbar() {
   const navLinks = [
     { to: "/buy", label: "Buy" },
     { to: "/sell", label: "Sell" },
-    { to: "/service", label: "Service" },
     { to: "/parts", label: "Spare Parts" },
     { to: "/about", label: "About Us" },
   ];

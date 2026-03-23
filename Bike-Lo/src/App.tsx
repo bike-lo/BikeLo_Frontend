@@ -9,7 +9,6 @@ import Home from '@/pages/Home'
 import Bikes from '@/pages/Bikes'
 import Buy from '@/pages/Buy'
 import Sell from '@/pages/Sell'
-import Service from '@/pages/Service'
 import Parts from '@/pages/Parts'
 import About from '@/pages/About'
 import Auth from '@/pages/Auth'
@@ -47,7 +46,6 @@ function App() {
                 <Route path="/bikes" element={<ProtectedRoute><Bikes /></ProtectedRoute>} />
                 <Route path="/buy" element={<ProtectedRoute><Buy /></ProtectedRoute>} />
                 <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
-                <Route path="/service" element={<ProtectedRoute><Service /></ProtectedRoute>} />
                 <Route path="/parts" element={<ProtectedRoute><Parts /></ProtectedRoute>} />
                 <Route path="/about" element={<About />} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />

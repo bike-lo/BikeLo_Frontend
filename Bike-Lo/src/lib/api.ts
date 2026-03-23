@@ -4,7 +4,7 @@
  */
 export const API_BASE =
   (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_URL) ||
-  "http://0.0.0.0:8001"
+  "https://earl-standards-protected-cartoon.trycloudflare.com"
 const ACCESS_TOKEN_KEY = "bikelo_access_token";
 const REFRESH_TOKEN_KEY = "bikelo_refresh_token";
 

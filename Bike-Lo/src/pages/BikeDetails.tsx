@@ -5,7 +5,7 @@ import { getBikes, bikeImageUrl, bookBikeLeadApi } from "@/services/bikeService"
 import { meApi } from "@/services/authService";
 import type { BikeResponse } from "@/types/api";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Shield, Gauge, Calendar, CheckCircle2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 export default function BikeDetails() {
   const { id } = useParams();
@@ -157,13 +157,6 @@ export default function BikeDetails() {
     { label: "Insurance", value: bike.insurance ? "Available" : "Not Available" },
   ];
 
-  // Key features derived from data
-  const keyFeatures = [
-    { icon: <Calendar className="w-5 h-5" />, label: `${bike.year} Model` },
-    { icon: <Gauge className="w-5 h-5" />, label: `${bike.km_driven.toLocaleString()} km driven` },
-    { icon: <Shield className="w-5 h-5" />, label: bike.insurance ? "Insurance Included" : "No Insurance" },
-    { icon: <CheckCircle2 className="w-5 h-5" />, label: ownership },
-  ];
 
   return (
     <div className="min-h-screen pt-20 px-4 sm:px-6 lg:px-12 pb-16">

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import { createSellListing } from "@/services/sellListingService";
+import { bookBikeLeadApi } from "@/services/bikeService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,6 +53,53 @@ export default function Sell() {
         finance_hypothecation: financeHypothecation === "yes",
         original_rc_available: originalRcAvailable === "yes",
       });
+
+      if (user) {
+        const userHtml = `
+          <div style="font-family: sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #ea580c;">Bike Sell Request Received</h2>
+            <p>Hi ${user.name},</p>
+            <p>Thank you for choosing BikeLo to sell your bike. We have successfully received your request with the following details:</p>
+            <ul>
+              <li><strong>Model:</strong> ${model.trim()}</li>
+              <li><strong>Year:</strong> ${y}</li>
+              <li><strong>Owners:</strong> ${owners}</li>
+            </ul>
+            <p>Our team will review your details and contact you shortly.</p>
+            <p>Best regards,<br/>The BikeLo Team</p>
+          </div>
+        `;
+
+        const adminHtml = `
+          <div style="font-family: sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #ea580c;">New Bike Sell Request</h2>
+            <p>A new user has submitted a request to sell their bike.</p>
+            <h3>User Details</h3>
+            <ul>
+              <li><strong>Name:</strong> ${user.name}</li>
+              <li><strong>Email:</strong> ${user.email}</li>
+              <li><strong>Phone:</strong> ${user.phone || "Not provided"}</li>
+            </ul>
+            <h3>Bike Details</h3>
+            <ul>
+              <li><strong>Model:</strong> ${model.trim()}</li>
+              <li><strong>Year:</strong> ${y}</li>
+              <li><strong>Number of Owners:</strong> ${owners}</li>
+              <li><strong>Insurance Available:</strong> ${insuranceAvailable}</li>
+              <li><strong>Finance/Hypothecation:</strong> ${financeHypothecation}</li>
+              <li><strong>Original RC Available:</strong> ${originalRcAvailable}</li>
+            </ul>
+          </div>
+        `;
+
+        await bookBikeLeadApi({
+          email: user.email,
+          subject: "Bike Sell Request - BikeLo",
+          "UserHTML ": userHtml,
+          "AdminHTML ": adminHtml,
+        });
+      }
+
       setSuccess(true);
       setModel("");
       setYear("");

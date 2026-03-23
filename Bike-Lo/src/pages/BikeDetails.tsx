@@ -50,6 +50,7 @@ export default function BikeDetails() {
 
     let userEmail = "unknown@bikelo.com";
     let userName = "Customer";
+    let userPhone = "Not provided";
 
     // Fetch logged-in user details (requires valid JWT in localStorage)
     try {
@@ -57,6 +58,7 @@ export default function BikeDetails() {
       console.debug("[BookNow] Current user:", me);
       userEmail = me.email ?? userEmail;
       userName = me.name ?? userName;
+      userPhone = me.phone ?? userPhone;
     } catch (err) {
       console.warn("[BookNow] Could not fetch user info — user may not be logged in:", err);
       setBookingLoading(false);
@@ -85,6 +87,7 @@ export default function BikeDetails() {
   <table style="width:100%;border-collapse:collapse;">
     <tr><td style="padding:8px;border:1px solid #eee;font-weight:bold;">Customer</td><td style="padding:8px;border:1px solid #eee;">${userName}</td></tr>
     <tr><td style="padding:8px;border:1px solid #eee;font-weight:bold;">Email</td><td style="padding:8px;border:1px solid #eee;">${userEmail}</td></tr>
+    <tr><td style="padding:8px;border:1px solid #eee;font-weight:bold;">Phone</td><td style="padding:8px;border:1px solid #eee;">${userPhone}</td></tr>
     <tr><td style="padding:8px;border:1px solid #eee;font-weight:bold;">Bike</td><td style="padding:8px;border:1px solid #eee;">${bikeTitle}</td></tr>
     <tr><td style="padding:8px;border:1px solid #eee;font-weight:bold;">Price</td><td style="padding:8px;border:1px solid #eee;">${priceFormatted}</td></tr>
     <tr><td style="padding:8px;border:1px solid #eee;font-weight:bold;">Bike ID</td><td style="padding:8px;border:1px solid #eee;">${bike.id}</td></tr>

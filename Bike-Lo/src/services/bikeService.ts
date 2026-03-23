@@ -72,6 +72,23 @@ export async function updateBike(bikeId: number, data: UpdateBikeRequest): Promi
   return parseJson<BikeResponse>(res);
 }
 
+/** Capture a lead (Book Now / Sell enquiry). Requires auth. */
+export interface LeadCapturePayload {
+  email: string;
+  subject: string;
+  "UserHTML ": string;
+  "AdminHTML ": string;
+}
+
+export async function bookBikeLeadApi(payload: LeadCapturePayload): Promise<{ message: string }> {
+  const res = await fetchWithAuth("/leads/capture", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return parseJson<{ message: string }>(res);
+}
+
 /** Delete a bike by id (requires auth). */
 export async function deleteBike(bikeId: number): Promise<void> {
   const res = await fetchWithAuth(`/bikes/${bikeId}`, { method: "DELETE" });
@@ -85,24 +102,4 @@ export async function deleteBike(bikeId: number): Promise<void> {
     }
     throw new Error((detail as any)?.detail ?? text);
   }
-}
-
-export interface BookBikeLeadPayload {
-  email: string;
-  subject: string;
-  "UserHTML ": string;
-  "AdminHTML ": string;
-}
-
-export async function bookBikeLeadApi(payload: BookBikeLeadPayload): Promise<unknown> {
-  const res = await fetch(`${API_BASE}/leads/capture`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Failed to submit booking lead");
-  }
-  return res.json().catch(() => ({}));
 }

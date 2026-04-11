@@ -11,9 +11,6 @@
     "test": "vitest run --environment jsdom"
   },
   "dependencies": {
-    "@dotlottie/react-player": "^1.6.19",
-    "@lottiefiles/dotlottie-react": "^0.18.9",
-    "@lottiefiles/react-lottie-player": "^3.6.0",
     "@radix-ui/react-navigation-menu": "^1.2.14",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",

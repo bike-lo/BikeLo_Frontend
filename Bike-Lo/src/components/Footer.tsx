@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Linkedin, Facebook, Twitter, Phone } from "lucide-react";
+import { Instagram, Linkedin, Facebook, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Footer() {
@@ -53,18 +53,6 @@ export default function Footer() {
     { label: "Connect with us", href: "/contact" },
   ];
 
-  const buyLocations = [
-    "Delhi NCR", "Bangalore", "Hyderabad", "Mumbai", "Pune", "Delhi",
-    "Gurgaon", "Noida", "Ahmedabad", "Chennai", "Kolkata", "Lucknow",
-    "Jaipur", "Agra", "Ambala", "Chandigarh", "Coimbatore", "Faridabad",
-    "Ghaziabad", "Kanpur", "Karnal", "Kochi", "Mysuru", "Sonipat", "Visakhapatnam"
-  ];
-
-  const serviceLocations = [
-    "Delhi NCR", "Bangalore", "Hyderabad", "Mumbai", "Pune", "Delhi",
-    "Gurgaon", "Noida", "Ahmedabad", "Chennai", "Kolkata", "Lucknow",
-    "Jaipur", "Chandigarh", "Coimbatore", "Faridabad", "Ghaziabad"
-  ];
 
   return (
     <footer className="footer-container">
@@ -94,17 +82,14 @@ export default function Footer() {
 
             {/* Social Icons */}
             <div className="footer-social">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
+              <a href="https://www.instagram.com/bikelo.official?igsh=MXY2Z2Z0bHIxZng3bA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">
                 <Instagram size={22} />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">
+              <a href="https://www.linkedin.com/in/bike-lo-com-aa6630346?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">
                 <Linkedin size={22} />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Facebook">
+              <a href="https://www.facebook.com/share/1GVTEa6Eb2/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Facebook">
                 <Facebook size={22} />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="X (Twitter)">
-                <Twitter size={22} />
               </a>
             </div>
 
@@ -216,20 +201,36 @@ export default function Footer() {
         </div>
 
         {/* Bottom Section - Locations */}
-        <div className="footer-locations">
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-12">
-            <div className="location-section flex-1 mb-0">
-              <h5 className="location-heading">BUY USED BIKE IN</h5>
-              <p className="location-list">
-                {buyLocations.join(" | ")}
-              </p>
-            </div>
-
-            <div className="location-section flex-1 mb-0">
-              <h5 className="location-heading">BIKE REPAIR & SERVICING IN</h5>
-              <p className="location-list">
-                {serviceLocations.join(" | ")}
-              </p>
+        <div className="footer-locations border-t border-white/5 pt-8 mt-12">
+          <div className="flex flex-col items-center text-center">
+            <h5 className="location-heading text-[#f7931e] mb-4">OUR LOCATIONS</h5>
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm">
+              <a 
+                href="https://maps.app.goo.gl/76waTVzyVEZaxLJ17" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="footer-link hover:text-[#f7931e] transition-colors"
+              >
+                BikeLo Hub (Old Alwal)
+              </a>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <a 
+                href="https://maps.app.goo.gl/eLAUFUBYir1qJhhT7" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="footer-link hover:text-[#f7931e] transition-colors"
+              >
+                SSV Multibrand Hub
+              </a>
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <a 
+                href="https://maps.app.goo.gl/oTqjDt6Hjs8kp84w7" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="footer-link hover:text-[#f7931e] transition-colors"
+              >
+                GearUp VOC Hub
+              </a>
             </div>
           </div>
         </div>

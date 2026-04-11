@@ -9,36 +9,36 @@ interface BikeCardProps {
 }
 
 export default function BikeCard({ bike, isWishlisted, onWishlistToggle, onClick }: BikeCardProps) {
-  const formatPrice = (price: number) => `₹ ${price.toFixed(2)} L`;
-
-  const formatKms = (kms: number) =>
-    kms >= 1000 ? `${(kms / 1000).toFixed(1)}k km` : `${kms} km`;
+  const formatPrice = (price: number) => `₹ ${price.toLocaleString("en-IN")}`;
 
   return (
     <div
-      className="group relative bg-white/5 dark:bg-neutral-900/60 border border-white/10 dark:border-neutral-800 rounded-xl overflow-hidden hover:border-[#f7931e]/40 hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] dark:hover:shadow-[0_20px_50px_rgba(247,147,30,0.08)] transition-all duration-500 cursor-pointer backdrop-blur-sm"
+      className="group relative bg-neutral-900/40 backdrop-blur-md border border-white/5 dark:border-neutral-800/60 rounded-[1.5rem] overflow-hidden hover:border-[#f7931e]/50 hover:shadow-[0_20px_60px_rgba(247,147,30,0.15)] transition-all duration-700 cursor-pointer"
       onClick={() => onClick?.(bike.id)}
     >
-      {/* Image */}
-      <div className="aspect-[4/3] overflow-hidden relative">
+      {/* Image Container */}
+      <div className="aspect-[1.5/1] overflow-hidden relative">
         {bike.imageUrl ? (
           <img
             src={bike.imageUrl}
             alt={`${bike.brand} ${bike.model}`}
-            className="w-full h-full object-cover grayscale-[30%] brightness-90 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-105 transition-all duration-700"
+            className="w-full h-full object-cover grayscale-[20%] brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-110 transition-all duration-1000 ease-out"
           />
         ) : (
-          <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
-            <span className="text-neutral-600 text-sm">No Image</span>
+          <div className="w-full h-full bg-neutral-900 flex items-center justify-center">
+            <span className="text-neutral-700 text-xs uppercase tracking-widest font-black">No Visual</span>
           </div>
         )}
 
+        {/* Glossy Overlay Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent opacity-80" />
+
         {/* Tags top-left */}
-        <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+        <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
           {bike.tags?.map((tag) => (
             <Badge
               key={tag}
-              className="bg-[#f7931e] text-white text-[10px] px-2 py-0.5 uppercase tracking-wide font-bold italic border-0"
+              className="bg-[#f7931e] text-white text-[9px] px-2.5 py-0.5 uppercase tracking-widest font-black italic border-0 shadow-lg shadow-orange-500/20"
             >
               {tag}
             </Badge>
@@ -48,14 +48,14 @@ export default function BikeCard({ bike, isWishlisted, onWishlistToggle, onClick
         {/* Wishlist top-right */}
         <button
           onClick={(e) => { e.stopPropagation(); onWishlistToggle(bike.id); }}
-          className="absolute top-3 right-3 p-2 rounded-full backdrop-blur-md bg-black/30 hover:bg-black/50 transition-colors"
+          className="absolute top-4 right-4 p-2.5 rounded-full backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-[#f7931e] hover:border-[#f7931e] transition-all duration-500 z-10 group/wishlist"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <svg
-            className={`w-4 h-4 ${isWishlisted ? "fill-[#f7931e] text-[#f7931e]" : "fill-none text-white"}`}
+            className={`w-4 h-4 transition-all duration-500 ${isWishlisted ? "fill-white text-white scale-110" : "fill-none text-white group-hover/wishlist:scale-110"}`}
             viewBox="0 0 24 24"
             stroke="currentColor"
-            strokeWidth={2}
+            strokeWidth={2.5}
           >
             <path
               strokeLinecap="round"
@@ -65,53 +65,67 @@ export default function BikeCard({ bike, isWishlisted, onWishlistToggle, onClick
           </svg>
         </button>
 
-        {/* Price overlay bottom-right */}
-        <div className="absolute bottom-3 right-3 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-lg">
-          <span className="text-white font-bold text-base tracking-tight" style={{ fontFamily: "'Noto Serif', serif" }}>
-            {formatPrice(bike.price)}
-          </span>
+        {/* Price Tag */}
+        <div className="absolute bottom-4 left-4 z-10">
+          <div className="flex flex-col">
+            <span className="text-[10px] text-neutral-400 uppercase font-bold tracking-[0.2em] leading-none mb-1">Reserve For</span>
+            <span className="text-2xl font-black text-white tracking-tighter" style={{ fontFamily: "'Noto Serif', serif" }}>
+              {formatPrice(bike.price)}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-5 space-y-4">
-        {/* Title + location */}
-        <div className="space-y-0.5">
+      <div className="p-6 space-y-4">
+        {/* Title Group */}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-[#f7931e] uppercase tracking-[0.3em]">{bike.year}</span>
+            <div className="h-px w-4 bg-neutral-800" />
+            <span className="text-[10px] font-black text-neutral-500 uppercase tracking-[0.3em]">{bike.brand}</span>
+          </div>
           <h3
-            className="text-lg font-bold text-black dark:text-white uppercase italic leading-tight group-hover:text-[#f7931e] transition-colors"
+            className="text-xl font-black italic tracking-tighter text-white uppercase leading-none group-hover:text-[#f7931e] transition-all duration-500"
             style={{ fontFamily: "'Noto Serif', serif" }}
           >
-            {bike.year} {bike.brand} {bike.model}
+            {bike.model}
           </h3>
-          <p className="text-xs font-medium uppercase tracking-widest text-neutral-500">
+          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-500 truncate">
             {bike.variant}
           </p>
         </div>
 
-        {/* Spec chips */}
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { label: "KMs", value: formatKms(bike.kmsDriven) },
-            { label: "Fuel", value: bike.fuelType },
-            { label: "Trans", value: bike.transmission },
-          ].map((spec) => (
-            <div
-              key={spec.label}
-              className="bg-neutral-100 dark:bg-neutral-800/60 rounded-full px-2 py-1.5 flex flex-col items-center justify-center"
-            >
-              <span className="text-[9px] uppercase text-neutral-400 font-bold tracking-wider">{spec.label}</span>
-              <span className="text-[11px] text-black dark:text-white font-bold truncate w-full text-center">{spec.value}</span>
-            </div>
-          ))}
+        {/* Technical Summary */}
+        <div className="flex items-center gap-4 pt-2">
+           <div className="flex flex-col">
+             <span className="text-[8px] uppercase text-neutral-600 font-black tracking-widest">Mileage</span>
+             <span className="text-xs font-bold text-neutral-300">Certified</span>
+           </div>
+           <div className="w-px h-6 bg-neutral-800" />
+           <div className="flex flex-col">
+             <span className="text-[8px] uppercase text-neutral-600 font-black tracking-widest">History</span>
+             <span className="text-xs font-bold text-neutral-300">Clean</span>
+           </div>
         </div>
 
-        {/* EMI + CTA */}
-        <div className="flex items-center justify-between pt-1 border-t border-neutral-200 dark:border-neutral-800">
-          <span className="text-xs text-neutral-500">
-            EMI <span className="text-[#f7931e] font-semibold">₹{bike.emi.toLocaleString()}/mo</span>
-          </span>
-          <button className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-500 dark:text-neutral-400 group-hover:text-[#f7931e] border border-neutral-300 dark:border-neutral-700 group-hover:border-[#f7931e]/50 px-3 py-1.5 rounded transition-all">
-            View Details →
+        {/* Action Bar */}
+        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <div className="flex -space-x-2">
+            {[1,2,3].map(i => (
+              <div key={i} className="w-6 h-6 rounded-full border-2 border-neutral-900 bg-neutral-800 flex items-center justify-center overflow-hidden">
+                <div className="w-full h-full bg-neutral-700 animate-pulse" />
+              </div>
+            ))}
+            <span className="text-[8px] text-neutral-500 font-bold flex items-center ml-4 uppercase tracking-widest">Verified</span>
+          </div>
+          <button className="text-[9px] font-black uppercase tracking-[0.3em] text-neutral-400 group-hover:text-white transition-all flex items-center gap-2">
+             Configure 
+             <div className="w-5 h-5 rounded-full bg-neutral-800 group-hover:bg-[#f7931e] flex items-center justify-center transition-all">
+                <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                </svg>
+             </div>
           </button>
         </div>
       </div>

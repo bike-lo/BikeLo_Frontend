@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { submitSellBike } from "@/services/sellBikeService";
+import { bookBikeLeadApi } from "@/services/bikeService";
+import { useAuth } from "@/hooks/use-auth";
 
 interface SellFormProps {
   onSuccess?: () => void;
 }
 
 export default function SellForm({ onSuccess }: SellFormProps) {
+  const { user } = useAuth();
   const [vehicleType, setVehicleType] = useState<"new" | "existing">("existing");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +84,129 @@ export default function SellForm({ onSuccess }: SellFormProps) {
         if (rcFile) fd.append("rc_card", rcFile);
       }
 
-      await submitSellBike(fd);
+      const response = await submitSellBike(fd);
+
+      // ── Email Notification Logic ─────────────────────────────────────────
+      if (user) {
+        const bikeTitle = `${formData.brand} ${formData.model} (${yearNum})`;
+        
+        const resolveUrl = (url?: string | null) => {
+          if (!url) return null;
+          return url.startsWith('http') ? url : `${import.meta.env.VITE_API_URL || 'http://localhost:8001'}${url}`;
+        };
+        const invoiceUrl = resolveUrl(response.invoice_url);
+        const rcCardUrl = resolveUrl(response.rc_card_url);
+        const isImage = (url: string) => /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
+
+        const uploadedDocsRows = [
+          invoiceUrl ? `
+            <tr>
+              <td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9; vertical-align: top;">Invoice</td>
+              <td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">
+                <a href="${invoiceUrl}" target="_blank" style="color: #10b981; text-decoration: none; display: inline-block; margin-bottom: 10px;">View Invoice ↗</a>
+                ${isImage(invoiceUrl) ? `<br/><img src="${invoiceUrl}" alt="Invoice" style="max-width: 100%; max-height: 300px; border-radius: 4px; border: 1px solid #e2e8f0; display: block;" />` : ''}
+              </td>
+            </tr>` : '',
+          rcCardUrl ? `
+            <tr>
+              <td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9; vertical-align: top;">RC Card</td>
+              <td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">
+                <a href="${rcCardUrl}" target="_blank" style="color: #10b981; text-decoration: none; display: inline-block; margin-bottom: 10px;">View RC Card ↗</a>
+                ${isImage(rcCardUrl) ? `<br/><img src="${rcCardUrl}" alt="RC Card" style="max-width: 100%; max-height: 300px; border-radius: 4px; border: 1px solid #e2e8f0; display: block;" />` : ''}
+              </td>
+            </tr>` : ''
+        ].filter(Boolean).join('');
+
+        const docsSectionHtml = uploadedDocsRows ? `
+            <p style="color: #64748b; font-weight: bold; text-transform: uppercase; font-size: 12px; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Uploaded Documents</p>
+            <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+              ${uploadedDocsRows}
+            </table>
+        ` : '';
+
+        const userHtml = `
+<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f8fafc" style="font-family: sans-serif; width: 100%;">
+  <tr>
+    <td align="center" style="padding: 40px 0;">
+      <table width="600" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="margin: 0 auto; max-width: 600px; border-radius: 8px; border: 1px solid #e2e8f0; border-collapse: collapse;">
+        <tr>
+          <td bgcolor="#1e293b" style="padding: 20px 30px; text-align: center; border-bottom: 3px solid #f7931e; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+            <span style="font-size: 24px; font-weight: bold; color: #f7931e;">Bike-Lo</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 30px;">
+            <h2 style="color: #1e293b; margin-top: 0;">Request Received</h2>
+            <p style="color: #475569; line-height: 1.6;">Hi <strong>${user.name}</strong>,<br>We've received your request for vehicle insurance/evaluation. Our team will review the details and get back to you shortly.</p>
+            <table width="100%" cellpadding="10" cellspacing="0" style="margin: 20px 0; border-collapse: collapse;">
+              <tr>
+                <td style="border: 1px solid #e2e8f0; color: #64748b; font-weight: bold; width: 35%;">Vehicle Details</td>
+                <td style="border: 1px solid #e2e8f0; color: #1e293b; font-weight: bold;">${bikeTitle}</td>
+              </tr>
+              <tr>
+                <td style="border: 1px solid #e2e8f0; color: #64748b; font-weight: bold;">Application ID</td>
+                <td style="border: 1px solid #e2e8f0; color: #10b981; font-weight: bold;">INS-${Date.now().toString().slice(-6)}</td>
+              </tr>
+            </table>
+            ${docsSectionHtml}
+            <br>
+            <center>
+              <a href="https://bike-lo.com/profile" style="background-color: #10b981; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 4px; font-weight: bold; display: inline-block;">View Status</a>
+            </center>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`.trim();
+
+        const adminHtml = `
+<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f8fafc" style="font-family: sans-serif; width: 100%;">
+  <tr>
+    <td align="center" style="padding: 40px 0;">
+      <table width="600" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="margin: 0 auto; max-width: 600px; border-radius: 8px; border: 1px solid #e2e8f0; border-collapse: collapse;">
+        <tr>
+          <td bgcolor="#1e293b" style="padding: 20px 30px; border-bottom: 3px solid #f7931e; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+            <span style="font-size: 24px; font-weight: bold; color: #f7931e;">Bike-Lo</span>
+            <span style="color: #ffffff; float: right; font-size: 14px; font-weight: bold; margin-top: 6px;">INSURANCE LEAD 🚨</span>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 30px;">
+            <h2 style="color: #1e293b; margin-top: 0;">New Evaluation Request</h2>
+            
+            <p style="color: #64748b; font-weight: bold; text-transform: uppercase; font-size: 12px; margin-top: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Customer Information</p>
+            <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Name</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${user.name}</td></tr>
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Email</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${user.email}</td></tr>
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Phone</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${user.phone || "Not provided"}</td></tr>
+            </table>
+
+            <p style="color: #64748b; font-weight: bold; text-transform: uppercase; font-size: 12px; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">Vehicle Details</p>
+            <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Type</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${vehicleType}</td></tr>
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Brand</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${formData.brand}</td></tr>
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Model</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${formData.model}</td></tr>
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Year</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${yearNum}</td></tr>
+              <tr><td style="color: #64748b; width: 140px; border-bottom: 1px solid #f1f5f9;">Reg No</td><td style="color: #1e293b; font-weight: bold; border-bottom: 1px solid #f1f5f9;">${formData.registrationNumber || "N/A"}</td></tr>
+            </table>
+            
+            ${docsSectionHtml}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>`.trim();
+
+        await bookBikeLeadApi({
+          email: user.email,
+          subject: "Insurance/Evaluation Request - BikeLo",
+          UserHTML: userHtml,
+          AdminHTML: adminHtml,
+        });
+      }
+
       setFormData({ brand: "", year: "", model: "", exShowroom: "", registrationNumber: "" });
       setRcFile(null);
       setInvoiceFile(null);
@@ -96,12 +221,15 @@ export default function SellForm({ onSuccess }: SellFormProps) {
   };
 
   return (
-    <Card className="w-full !bg-white dark:!bg-gray-900/50 border border-gray-300 dark:border-gray-700 shadow-none">
-      <CardHeader>
-        <CardTitle className="text-2xl flex items-center gap-2 text-black dark:text-white" style={{ fontFamily: "'Noto Serif', serif" }}>
-          <svg className="w-6 h-6 text-[#f7931e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+    <Card className="w-full bg-neutral-900/60 dark:bg-gray-900/40 backdrop-blur-md border-[#f7931e]/20 shadow-2xl overflow-hidden ring-1 ring-white/5">
+
+      <CardHeader className="pb-8 border-b border-white/5">
+        <CardTitle className="text-2xl flex items-center gap-3 text-white" style={{ fontFamily: "'Noto Serif', serif" }}>
+          <div className="bg-[#f7931e] rounded-full p-1.5 shadow-lg shadow-orange-500/20">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
           Bike Details
         </CardTitle>
       </CardHeader>
@@ -115,62 +243,58 @@ export default function SellForm({ onSuccess }: SellFormProps) {
 
           {/* Vehicle Type Selection */}
           <div>
-            <Label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3" style={{ fontFamily: "'Noto Serif', serif" }}>
+            <Label className="block text-sm font-medium text-gray-400 mb-4 tracking-wide uppercase" style={{ fontFamily: "'Inter', sans-serif" }}>
               Bike Type
             </Label>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="cursor-pointer block">
-                <input
-                  type="radio"
-                  name="vehicleType"
-                  value="new"
-                  checked={vehicleType === "new"}
-                  onChange={() => setVehicleType("new")}
-                  className="peer sr-only"
-                />
-                <div className="bg-white dark:bg-gray-800/50 border-2 border-gray-300 dark:border-gray-600 peer-checked:bg-emerald-600 peer-checked:border-emerald-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all rounded-xl p-4 text-center">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300 peer-checked:text-white block">New Vehicle</span>
-                </div>
-              </label>
-              <label className="cursor-pointer block">
-                <input
-                  type="radio"
-                  name="vehicleType"
-                  value="existing"
-                  checked={vehicleType === "existing"}
-                  onChange={() => setVehicleType("existing")}
-                  className="peer sr-only"
-                />
-                <div className="bg-white dark:bg-gray-800/50 border-2 border-gray-300 dark:border-gray-600 peer-checked:bg-emerald-600 peer-checked:border-emerald-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all rounded-xl p-4 text-center">
-                  <span className="font-semibold text-gray-700 dark:text-gray-300 peer-checked:text-white block">Used / Existing</span>
-                </div>
-              </label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setVehicleType("new")}
+                className={`transition-all duration-300 rounded-xl p-4 text-center border-2 font-semibold ${vehicleType === "new"
+                    ? "bg-[#059669] border-[#059669] text-white shadow-lg shadow-emerald-500/20"
+                    : "bg-transparent border-gray-700 text-gray-400 hover:border-gray-600 hover:bg-white/5"
+                  }`}
+              >
+                New Vehicle
+              </button>
+              <button
+                type="button"
+                onClick={() => setVehicleType("existing")}
+                className={`transition-all duration-300 rounded-xl p-4 text-center border-2 font-semibold ${vehicleType === "existing"
+                    ? "bg-[#059669] border-[#059669] text-white shadow-lg shadow-emerald-500/20"
+                    : "bg-transparent border-gray-700 text-gray-400 hover:border-gray-600 hover:bg-white/5"
+                  }`}
+              >
+                Used / Existing
+              </button>
             </div>
           </div>
 
           <div className="space-y-5">
-            
+
             {/* Common Fields */}
             <div className="grid grid-cols-2 gap-5">
               <div className="col-span-2 md:col-span-1">
-                <Label htmlFor="brand" className="text-sm text-gray-700 dark:text-gray-300">Brand</Label>
-                <Select
-                  id="brand"
-                  value={formData.brand}
-                  onChange={(e) => handleInputChange("brand", e.target.value)}
-                  className="mt-1 !bg-white dark:!bg-gray-800/50 border-gray-300 dark:border-gray-600 !text-black dark:!text-white"
-                  required
-                >
-                  <option value="" className="bg-white dark:bg-gray-800">Select Brand</option>
-                  {bikeBrands.map((brand) => (
-                    <option key={brand} value={brand.toLowerCase()} className="bg-white dark:bg-gray-800">
-                      {brand}
-                    </option>
-                  ))}
-                </Select>
+                <Label htmlFor="brand" className="text-sm font-medium text-gray-400 mb-1.5 block">Brand</Label>
+                <div className="relative">
+                  <Select
+                    id="brand"
+                    value={formData.brand}
+                    onChange={(e) => handleInputChange("brand", e.target.value)}
+                    className="w-full bg-[#111827] border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all outline-none h-11 px-3"
+                    required
+                  >
+                    <option value="" className="bg-[#111827]">Select Brand</option>
+                    {bikeBrands.map((brand) => (
+                      <option key={brand} value={brand.toLowerCase()} className="bg-[#111827]">
+                        {brand}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
               </div>
               <div className="col-span-2 md:col-span-1">
-                <Label htmlFor="year" className="text-sm text-gray-700 dark:text-gray-300">Year</Label>
+                <Label htmlFor="year" className="text-sm font-medium text-gray-400 mb-1.5 block">Year</Label>
                 <Input
                   id="year"
                   type="number"
@@ -179,21 +303,21 @@ export default function SellForm({ onSuccess }: SellFormProps) {
                   placeholder="YYYY"
                   value={formData.year}
                   onChange={(e) => handleInputChange("year", e.target.value)}
-                  className="mt-1 !bg-white dark:!bg-gray-800/50 border-gray-300 dark:border-gray-600 !text-black dark:!text-white"
+                  className="bg-[#111827] border-gray-700 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all h-11"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="model" className="text-sm text-gray-700 dark:text-gray-300">Model</Label>
+              <Label htmlFor="model" className="text-sm font-medium text-gray-400 mb-1.5 block">Model</Label>
               <Input
                 id="model"
                 type="text"
                 placeholder="e.g. Activa, MT-15, Classic 350"
                 value={formData.model}
                 onChange={(e) => handleInputChange("model", e.target.value)}
-                className="mt-1 !bg-white dark:!bg-gray-800/50 border-gray-300 dark:border-gray-600 !text-black dark:!text-white"
+                className="bg-[#111827] border-gray-700 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all h-11"
                 required
               />
             </div>
@@ -202,7 +326,7 @@ export default function SellForm({ onSuccess }: SellFormProps) {
             {vehicleType === "new" && (
               <div className="space-y-5">
                 <div>
-                  <Label htmlFor="exShowroom" className="text-sm text-gray-700 dark:text-gray-300">Ex-showroom price (₹)</Label>
+                  <Label htmlFor="exShowroom" className="text-sm font-medium text-gray-400 mb-1.5 block">Ex-showroom price (₹)</Label>
                   <Input
                     id="exShowroom"
                     type="number"
@@ -211,18 +335,18 @@ export default function SellForm({ onSuccess }: SellFormProps) {
                     placeholder="e.g. 95000"
                     value={formData.exShowroom}
                     onChange={(e) => handleInputChange("exShowroom", e.target.value)}
-                    className="mt-1 !bg-white dark:!bg-gray-800/50 border-gray-300 dark:border-gray-600 !text-black dark:!text-white"
+                    className="bg-[#111827] border-gray-700 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all h-11"
                     required
                   />
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-700 dark:text-gray-300 mb-2 block">Upload Invoice</Label>
-                  <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-emerald-300 dark:border-emerald-600 border-dashed rounded-lg cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+                  <Label className="text-sm font-medium text-gray-400 mb-2 block tracking-wide">Upload Invoice</Label>
+                  <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-[#059669] border-dashed rounded-lg cursor-pointer bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all group">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">Click to upload</span> PDF, JPG or PNG (MAX. 10MB)
+                      <p className="mb-2 text-sm text-gray-400">
+                        <span className="font-semibold text-emerald-500 group-hover:text-emerald-400 transition-colors">Click to upload</span> PDF, JPG or PNG (MAX. 10MB)
                       </p>
-                      {invoiceFile && <p className="text-sm text-emerald-600 font-medium">{invoiceFile.name}</p>}
+                      {invoiceFile && <p className="text-xs text-emerald-500 font-medium px-2 py-1 bg-emerald-500/10 rounded">{invoiceFile.name}</p>}
                     </div>
                     <input
                       type="file"
@@ -240,25 +364,25 @@ export default function SellForm({ onSuccess }: SellFormProps) {
             {vehicleType === "existing" && (
               <div className="space-y-5">
                 <div>
-                  <Label htmlFor="registrationNumber" className="text-sm text-gray-700 dark:text-gray-300">Registration Number</Label>
+                  <Label htmlFor="registrationNumber" className="text-sm font-medium text-gray-400 mb-1.5 block">Registration Number</Label>
                   <Input
                     id="registrationNumber"
                     type="text"
-                    placeholder="e.g. KA-01-HQ-9999"
+                    placeholder="E.G. KA-01-HQ-9999"
                     value={formData.registrationNumber}
                     onChange={(e) => handleInputChange("registrationNumber", e.target.value.toUpperCase())}
-                    className="mt-1 !bg-white dark:!bg-gray-800/50 border-gray-300 dark:border-gray-600 !text-black dark:!text-white uppercase tracking-wider"
+                    className="bg-[#111827] border-gray-700 text-white placeholder:text-gray-600 focus:ring-2 focus:ring-[#059669] focus:border-transparent transition-all h-11 uppercase tracking-wider"
                     required
                   />
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-700 dark:text-gray-300 mb-2 block">Upload RC Card (Smart Card)</Label>
-                  <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-emerald-300 dark:border-emerald-600 border-dashed rounded-lg cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors">
+                  <Label className="text-sm font-medium text-gray-400 mb-2 block tracking-wide">Upload RC Card (Smart Card)</Label>
+                  <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-[#059669] border-dashed rounded-lg cursor-pointer bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all group">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">Click to upload</span> PDF, JPG or PNG (MAX. 10MB)
+                      <p className="mb-2 text-sm text-gray-400">
+                        <span className="font-semibold text-emerald-500 group-hover:text-emerald-400 transition-colors">Click to upload</span> PDF, JPG or PNG (MAX. 10MB)
                       </p>
-                      {rcFile && <p className="text-sm text-emerald-600 font-medium">{rcFile.name}</p>}
+                      {rcFile && <p className="text-xs text-emerald-500 font-medium px-2 py-1 bg-emerald-500/10 rounded">{rcFile.name}</p>}
                     </div>
                     <input
                       type="file"
@@ -278,7 +402,7 @@ export default function SellForm({ onSuccess }: SellFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-6 text-base font-semibold rounded-xl transition-all duration-200 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="group relative w-full py-7 text-lg font-bold rounded-xl transition-all duration-300 bg-[#059669] hover:bg-[#10b981] text-white shadow-lg shadow-emerald-600/20 hover:shadow-emerald-500/30 active:scale-[0.98] mt-4"
             style={{ fontFamily: "'Noto Serif', serif" }}
           >
             {isSubmitting ? (

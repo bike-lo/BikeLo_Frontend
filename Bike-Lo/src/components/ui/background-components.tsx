@@ -23,15 +23,24 @@ export const BackgroundComponents = ({
 
   return (
     <div
-      className={cn("min-h-screen w-full relative", className)}
+      className={cn("min-h-screen w-full relative transition-colors duration-500 bg-background", className)}
       style={
         { "--tile-hover": tileHoverColor } as React.CSSProperties
       }
     >
-      {/* ── Global Tile Grid Background (fixed, behind everything) ── */}
+      {/* ── Global Pattern Layer (fixed, bottom layer) ── */}
+      <div 
+        className="fixed inset-0 z-0 pointer-events-none opacity-[0.15] dark:opacity-25"
+        style={{
+          backgroundImage: `linear-gradient(${resolvedTheme === 'dark' ? '#1e293b' : '#e2e8f0'} 1px, transparent 1px), linear-gradient(90deg, ${resolvedTheme === 'dark' ? '#1e293b' : '#e2e8f0'} 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }}
+      />
+
+      {/* ── Global Tile Grid Background (fixed) ── */}
       <div
         className="fixed inset-0 z-0 overflow-hidden pointer-events-none"
-        style={{ opacity: resolvedTheme === "dark" ? 0.4 : 0.5 }}
+        style={{ opacity: resolvedTheme === "dark" ? 0.3 : 0.4 }}
       >
         <Tiles
           rows={50}

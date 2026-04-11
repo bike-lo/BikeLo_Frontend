@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -8,9 +7,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog } from "@/components/ui/dialog";
-import { useTheme } from "@/hooks/use-theme";
-import SellForm from "@/components/SellForm";
+import { useNavigate } from "react-router-dom";
 import illustration from "@/assets/file.svg";
 import Exchange from "@/assets/Exchange.svg";
 import Finance from "@/assets/Finance.svg";
@@ -52,8 +49,8 @@ const services = [
 ];
 
 export default function PremiumServices() {
-  const { resolvedTheme } = useTheme();
-  const [isSellModalOpen, setIsSellModalOpen] = useState(false);
+  const navigate = useNavigate();
+  
   
   return (
     <section className="premium-services py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 bg-transparent relative overflow-hidden">
@@ -81,10 +78,9 @@ export default function PremiumServices() {
           {services.map((service, index) => (
             <Card
               key={index}
-              className="service-card flex flex-col h-full dark:bg-gray-900/50 border border-gray-300 dark:border-gray-700 rounded-xl shadow-none hover:shadow-md hover:border-[#f7931e] transition-all duration-300 overflow-hidden"
+              className="service-card flex flex-col h-full bg-white/20 dark:bg-gray-900/30 backdrop-blur-sm border border-gray-300 dark:border-gray-700 rounded-xl shadow-none hover:shadow-md hover:border-[#f7931e] transition-all duration-300 overflow-hidden"
               style={{ 
                 animationDelay: `${index * 0.1}s`,
-                backgroundColor: resolvedTheme === 'light' ? '#FFFFFF' : undefined
               }}
             >
               {/* Card Illustration */}
@@ -117,7 +113,7 @@ export default function PremiumServices() {
                   style={{ fontFamily: "'Noto Serif', serif" }}
                   onClick={() => {
                     if (service.cta === "GET INSURED") {
-                      setIsSellModalOpen(true);
+                      navigate("/insurance");
                     }
                   }}
                 >
@@ -166,14 +162,7 @@ export default function PremiumServices() {
         }
       `}</style>
 
-      {/* Sell Form Modal */}
-      <Dialog
-        open={isSellModalOpen}
-        onOpenChange={setIsSellModalOpen}
-      >
-        <SellForm onSuccess={() => setIsSellModalOpen(false)} />
-      </Dialog>
+      {/* Sell Form Modal removed - now using dedicated /insurance page */}
     </section>
   );
 }
-

@@ -147,19 +147,19 @@ export default function Auth() {
         initial="hidden"
         animate="visible"
       >
-        <Card className="overflow-hidden border-border/50 shadow-2xl">
-          <div className="grid md:grid-cols-2 min-h-[580px] relative">
+        <Card className="overflow-hidden border-white/10 dark:border-white/5 bg-white/70 dark:bg-neutral-900/40 backdrop-blur-3xl shadow-2xl rounded-3xl">
+          <div className="grid md:grid-cols-2 min-h-[620px] relative">
             {/* ── Sliding Overlay Panel ── */}
             <motion.div
-              className="hidden md:flex absolute top-0 bottom-0 w-1/2 z-10 bg-[#f7931e] flex-col items-center justify-center p-10 text-white"
+              className="hidden md:flex absolute top-0 bottom-0 w-1/2 z-10 bg-gradient-to-br from-[#f7931e] to-[#e6851a] flex-col items-center justify-center p-10 text-white shadow-[10px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[10px_0_30px_rgba(0,0,0,0.3)]"
               animate={isSignUp ? 'signup' : 'signin'}
               variants={overlayVariants}
               transition={{
                 type: 'spring',
-                stiffness: 300,
-                damping: 30,
+                stiffness: 260,
+                damping: 25,
               }}
-              style={{ borderRadius: '0.75rem' }}
+              style={{ borderRadius: '1.5rem' }}
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -206,7 +206,7 @@ export default function Auth() {
             </motion.div>
 
             {/* ── Left Column: Sign In Form ── */}
-            <CardContent className={`flex-col justify-center p-8 md:p-10 bg-[var(--card)] ${isSignUp ? 'hidden md:flex' : 'flex'}`}>
+            <CardContent className={`flex-col justify-center p-8 md:p-12 bg-transparent ${isSignUp ? 'hidden md:flex' : 'flex'}`}>
               <motion.div
                 key="signin-form"
                 variants={formVariants}
@@ -309,7 +309,7 @@ export default function Auth() {
             </CardContent>
 
             {/* ── Right Column: Sign Up Form (desktop only) ── */}
-            <CardContent className={`flex-col justify-center p-8 md:p-10 bg-[var(--card)] ${isSignUp ? 'flex' : 'hidden md:flex'}`}>
+            <CardContent className={`flex-col justify-center p-8 md:p-12 bg-transparent ${isSignUp ? 'flex' : 'hidden md:flex'}`}>
               <motion.div
                 key="signup-form-right"
                 variants={formVariants}

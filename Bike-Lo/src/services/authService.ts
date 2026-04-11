@@ -140,3 +140,39 @@ export async function verifyOtpApi(email: string, otp: string): Promise<string> 
   if (!res.ok) throw new Error(text || "OTP verification failed");
   return text;
 }
+
+export async function createUserApi(payload: import("@/types/api").CreateUserRequest): Promise<UserResponse> {
+  const res = await fetchWithAuth("/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to create user");
+  }
+  return parseJson<UserResponse>(res);
+}
+
+export async function updateUserApi(userId: number, payload: import("@/types/api").UpdateUserRequest): Promise<UserResponse> {
+  const res = await fetchWithAuth(`/users/${userId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to update user");
+  }
+  return parseJson<UserResponse>(res);
+}
+
+export async function deleteUserApi(userId: number): Promise<void> {
+  const res = await fetchWithAuth(`/users/${userId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Failed to delete user");
+  }
+}

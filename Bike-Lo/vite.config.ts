@@ -11,6 +11,13 @@ export default defineConfig({
     },
   },
   server: {
+    proxy: {
+      '/api': {
+        target: 'https://vendor-involvement-polar-rows.trycloudflare.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
     watch: {
       // Workaround for Node.js v24 compatibility issue with Vite 7.x
       // Use polling as fallback to avoid ROOT_GLOBSTAR error

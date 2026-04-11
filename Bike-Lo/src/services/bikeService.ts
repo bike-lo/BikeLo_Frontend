@@ -25,6 +25,8 @@ export function mapBikeResponseToBike(b: BikeResponse): Bike {
     location: "",
     tags: [],
     imageUrl: bikeImageUrl(img),
+    isAd: b.is_ad === true || String(b.is_ad) === 'true' || b.make === 'N/A',
+    description: b.description || '',
   };
 }
 
@@ -72,12 +74,25 @@ export async function updateBike(bikeId: number, data: UpdateBikeRequest): Promi
   return parseJson<BikeResponse>(res);
 }
 
+/** Update a bike with multipart form (requires auth). */
+export async function updateBikeFormData(bikeId: number, formData: FormData): Promise<BikeResponse> {
+  const token = getAccessToken();
+  const headers: HeadersInit = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/bikes/${bikeId}`, {
+    method: "PUT",
+    headers,
+    body: formData,
+  });
+  return parseJson<BikeResponse>(res);
+}
+
 /** Capture a lead (Book Now / Sell enquiry). Requires auth. */
 export interface LeadCapturePayload {
   email: string;
   subject: string;
-  "UserHTML ": string;
-  "AdminHTML ": string;
+  "UserHTML": string;
+  "AdminHTML": string;
 }
 
 export async function bookBikeLeadApi(payload: LeadCapturePayload): Promise<{ message: string }> {

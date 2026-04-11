@@ -37,6 +37,22 @@ export interface UpdateRoleRequest {
   role: "user" | "admin";
 }
 
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  password?: string;
+  phone?: string;
+  role?: string;
+  status?: string;
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  phone?: string;
+  role?: string;
+  status?: string;
+}
+
 export interface ForgotPasswordRequest {
   email: string;
 }
@@ -62,6 +78,9 @@ export interface BikeResponse {
   ownership: number;
   price: number;
   insurance: boolean;
+  is_new: boolean;
+  description: string;
+  is_ad: boolean;
   image_count: number;
   created_at: string;
   updated_at: string | null;
@@ -114,4 +133,36 @@ export interface SellListingResponse {
   finance_hypothecation: boolean;
   original_rc_available: boolean;
   created_at: string;
+}
+
+// ----- Spare Parts -----
+export interface SparePartImageResponse {
+  id: number;
+  url: string;
+  created_at: string;
+}
+
+export interface SparePartResponse {
+  id: number;
+  name: string;
+  brand: string;
+  compatible_models: string;
+  price: number;
+  condition: string;
+  description: string;
+  is_available: boolean;
+  image_count: number;
+  created_at: string;
+  updated_at: string;
+  images: SparePartImageResponse[];
+}
+
+export interface UpdateSparePartRequest {
+  name?: string;
+  brand?: string;
+  compatible_models?: string;
+  price?: number;
+  condition?: string;
+  description?: string;
+  is_available?: boolean;
 }

@@ -31,6 +31,23 @@ export default function Buy() {
   const [bikes, setBikes] = useState<Bike[]>([]);
   const navigate = useNavigate();
 
+  // Dynamic filter metadata
+  const availableBrands = useMemo(() => {
+    return Array.from(new Set(bikes.map(b => b.brand))).sort();
+  }, [bikes]);
+
+  const maxPriceLimit = useMemo(() => {
+    const listMax = Math.max(...bikes.map(b => b.price), 0);
+    return Math.max(listMax, 3); // Fallback to 3 if no higher bikes present
+  }, [bikes]);
+
+  // Adjust max price range if new bikes are loaded that exceed our current max
+  useEffect(() => {
+    if (priceRange[1] < maxPriceLimit) {
+      setPriceRange([priceRange[0], maxPriceLimit]);
+    }
+  }, [maxPriceLimit]);
+
   // Fetch bikes from API (requires auth)
   useEffect(() => {
     let mounted = true;
@@ -57,13 +74,17 @@ export default function Buy() {
   const filteredBikes = useMemo(() => {
     return bikes.filter((bike) => {
       // Price filter
-      if (bike.price < priceRange[0] || bike.price > priceRange[1]) {
-        return false;
+      if (bike.price < priceRange[0] || (priceRange[1] < maxPriceLimit && bike.price > priceRange[1])) {
+        // Only filter by max if user has explicitly decreased it below the limit
+        if (bike.price > priceRange[1]) return false;
       }
 
-      // Brand filter
-      if (selectedBrands.length > 0 && !selectedBrands.includes(bike.brand)) {
-        return false;
+      // Brand filter (Case Insensitive)
+      if (selectedBrands.length > 0) {
+        const brandMatch = selectedBrands.some(
+          (sb) => sb.toLowerCase() === bike.brand.toLowerCase()
+        );
+        if (!brandMatch) return false;
       }
 
       // Year filter
@@ -71,7 +92,7 @@ export default function Buy() {
         return false;
       }
 
-      // Search filter
+      // Search filter (Case Insensitive)
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const searchText = `${bike.brand} ${bike.model} ${bike.variant}`.toLowerCase();
@@ -82,7 +103,7 @@ export default function Buy() {
 
       return true;
     });
-  }, [bikes, priceRange, selectedBrands, selectedYear, searchQuery]);
+  }, [bikes, priceRange, selectedBrands, selectedYear, searchQuery, maxPriceLimit]);
 
   const handleBikeClick = (bikeId: string) => {
     navigate(`/buy/${encodeURIComponent(bikeId)}`);
@@ -101,10 +122,10 @@ export default function Buy() {
   };
 
   return (
-    <div className="flex justify-center min-h-screen pt-16 bg-transparent">
-      <div className="flex w-full max-w-[1600px] lg:gap-6 px-4 sm:px-6 lg:px-8">
-        {/* Sidebar — sticky, full height (desktop only; mobile uses Sheet) */}
-        <div className="hidden lg:block flex-shrink-0 py-8">
+    <div className="flex justify-center min-h-screen pt-24 pb-20 bg-transparent text-white">
+      <div className="flex flex-col lg:flex-row w-full max-w-[1600px] lg:gap-12 px-4 sm:px-8 lg:px-12">
+        {/* Sidebar — sticky, full height (desktop only) */}
+        <div className="hidden lg:block flex-shrink-0">
           <FilterSidebar
             priceRange={priceRange}
             onPriceRangeChange={setPriceRange}
@@ -114,37 +135,45 @@ export default function Buy() {
             onYearChange={setSelectedYear}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            availableBrands={availableBrands}
+            maxPriceLimit={maxPriceLimit}
           />
         </div>
 
         {/* Main content */}
-        <div className="flex-1 py-8 space-y-10 overflow-y-auto min-w-0">
-        {/* Mobile filter trigger */}
-        <div className="block lg:hidden">
-          <FilterSidebar
-            priceRange={priceRange}
-            onPriceRangeChange={setPriceRange}
-            selectedBrands={selectedBrands}
-            onBrandsChange={setSelectedBrands}
-            selectedYear={selectedYear}
-            onYearChange={setSelectedYear}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-          />
+        <div className="flex-1 space-y-16 overflow-y-auto">
+          {/* Mobile filter trigger */}
+          <div className="block lg:hidden">
+            <FilterSidebar
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              selectedBrands={selectedBrands}
+              onBrandsChange={setSelectedBrands}
+              selectedYear={selectedYear}
+              onYearChange={setSelectedYear}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              availableBrands={availableBrands}
+              maxPriceLimit={maxPriceLimit}
+            />
+          </div>
+
+          {/* Bike grid with catalog header */}
+          <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <BikeGrid
+              bikes={filteredBikes}
+              wishlistedBikes={wishlistedBikes}
+              onWishlistToggle={handleWishlistToggle}
+              onBikeClick={handleBikeClick}
+            />
+          </section>
+
+          {/* Benefits */}
+          <section className="pt-12 border-t border-white/5">
+            <BenefitsSection />
+          </section>
         </div>
-
-        {/* Bike grid with catalog header */}
-        <BikeGrid
-          bikes={filteredBikes}
-          wishlistedBikes={wishlistedBikes}
-          onWishlistToggle={handleWishlistToggle}
-          onBikeClick={handleBikeClick}
-        />
-
-        {/* Benefits */}
-        <BenefitsSection />
       </div>
     </div>
-  </div>
   );
 }

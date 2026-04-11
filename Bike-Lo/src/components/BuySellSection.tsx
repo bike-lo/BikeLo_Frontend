@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { useTheme } from "@/hooks/use-theme";
 import Inspection from "@/assets/Inspection.webp";
 import EngineWarranty from "@/assets/6MonthsWarranty.webp";
 import Servicing from "@/assets/servicing.webp";
@@ -70,7 +69,6 @@ const sellingPoints = [
 export default function BuySellSection() {
   const [activeTab, setActiveTab] = useState<"buy" | "sell">("buy");
   const [selectedBrand, setSelectedBrand] = useState<number | null>(null);
-  const { resolvedTheme } = useTheme();
 
   return (
     <section className="buy-sell-section py-10 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-transparent">
@@ -132,10 +130,9 @@ export default function BuySellSection() {
               {benefits.map((benefit, index) => (
                 <div
                   key={benefit.id}
-                  className="benefit-card border border-gray-300 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-md hover:border-[#f7931e] transition-all duration-300 group"
+                  className="benefit-card border border-gray-300 dark:border-gray-700 bg-white/20 dark:bg-gray-900/30 backdrop-blur-sm rounded-lg overflow-hidden hover:shadow-md hover:border-[#f7931e] transition-all duration-300 group"
                   style={{ 
                     animationDelay: `${index * 0.1}s`,
-                    backgroundColor: resolvedTheme === 'light' ? '#FFFFFF' : undefined
                   }}
                 >
                   {/* Image with Icon Overlay */}
@@ -154,8 +151,7 @@ export default function BuySellSection() {
 
                   {/* Content */}
                   <div 
-                    className="p-4 dark:bg-transparent"
-                    style={{ backgroundColor: resolvedTheme === 'light' ? '#FFFFFF' : undefined }}
+                    className="p-4 bg-transparent"
                   >
                     <h3
                       className="text-base font-bold text-black dark:text-white mb-2 group-hover:text-[#f7931e] transition-colors duration-300"
@@ -258,12 +254,11 @@ export default function BuySellSection() {
                     <button
                       key={brand.id}
                       onClick={() => setSelectedBrand(brand.id)}
-                      className={`brand-card p-3 sm:p-4 dark:bg-transparent border rounded-lg flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-md ${
+                      className={`brand-card p-3 sm:p-4 bg-white/20 dark:bg-gray-900/30 backdrop-blur-sm border rounded-lg flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-md ${
                         selectedBrand === brand.id
                           ? "border-[#f7931e] shadow-md"
                           : "border-gray-300 dark:border-gray-700 hover:border-[#f7931e]"
                       }`}
-                      style={{ backgroundColor: resolvedTheme === 'light' ? '#FFFFFF' : undefined }}
                     >
                       <img
                         src={brand.logo}
@@ -278,8 +273,7 @@ export default function BuySellSection() {
                   ))}
                   {/* More Button */}
                   <button
-                    className="p-3 sm:p-4 dark:bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg flex items-center justify-center transition-all duration-300 hover:border-[#f7931e] hover:shadow-md"
-                    style={{ backgroundColor: resolvedTheme === 'light' ? '#FFFFFF' : undefined }}
+                    className="p-3 sm:p-4 bg-white/20 dark:bg-gray-900/30 backdrop-blur-sm border border-gray-300 dark:border-gray-700 rounded-lg flex items-center justify-center transition-all duration-300 hover:border-[#f7931e] hover:shadow-md"
                   >
                     <span
                       className="text-sm font-bold text-black dark:text-white"

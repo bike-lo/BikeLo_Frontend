@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { createBike } from '@/services/bikeService';
+import { createSparePart } from '@/services/sparePartService';
 import { 
   ChevronLeft, 
   Upload, 
@@ -15,12 +15,11 @@ import {
   CheckCircle2, 
   AlertCircle,
   Camera,
-  Info,
-  Settings2
+  Info
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function AdminAddBike() {
+export default function AdminAddPart() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -30,22 +29,20 @@ export default function AdminAddBike() {
     }
   }, [user, navigate]);
 
-  const [make, setMake] = useState('');
-  const [modelName, setModelName] = useState('');
-  const [condition, setCondition] = useState('new');
-  const [description, setDescription] = useState('');
-  const [year, setYear] = useState<number | ''>('');
-  const [kmDriven, setKmDriven] = useState<number | ''>('');
-  const [ownership, setOwnership] = useState<number | ''>('');
+  const [name, setName] = useState('');
+  const [brand, setBrand] = useState('');
+  const [compatibleModels, setCompatibleModels] = useState('');
   const [price, setPrice] = useState<number | ''>('');
-  const [insurance, setInsurance] = useState(false);
+  const [condition, setCondition] = useState('New');
+  const [description, setDescription] = useState('');
+  const [isAvailable, setIsAvailable] = useState(true);
   const [files, setFiles] = useState<
     { id: string; file: File; preview: string | null }[]
   >([]);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedPreview, setSelectedPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const MAX_FILES = condition === 'ads' ? 1 : 6;
+  const MAX_FILES = 5;
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -75,15 +72,9 @@ export default function AdminAddBike() {
   };
 
   const validate = () => {
-    if (condition === 'ads') {
-      if (!description.trim() || !modelName.trim()) return 'Model Name and Description are required for ads';
-      return null;
-    }
-    if (!make.trim() || !modelName.trim()) return 'Make and model are required';
-    if (!year || Number(year) < 1900 || Number(year) > 2100 || !Number.isInteger(Number(year))) return 'Enter a valid year between 1900 and 2100';
-    if (kmDriven === '' || Number(kmDriven) < 0) return 'Enter valid km driven';
-    if (condition !== 'new' && (ownership === '' || Number(ownership) < 0)) return 'Enter valid ownership count';
-    if (price === '' || Number(price) < 0) return 'Enter valid price';
+    if (!name.trim()) return 'Name is required';
+    if (!brand.trim()) return 'Brand is required';
+    if (price === '' || Number(price) < 0) return 'Enter a valid price';
     return null;
   };
 
@@ -100,34 +91,25 @@ export default function AdminAddBike() {
 
     try {
       const fd = new FormData();
-      fd.append('make', condition === 'ads' ? 'N/A' : make.trim());
-      fd.append('model_name', modelName.trim());
-      
-      let is_new = 'false';
-      let is_ad = 'false';
-      if (condition === 'new') is_new = 'true';
-      if (condition === 'ads') is_ad = 'true';
-      
-      fd.append('is_new', is_new);
-      fd.append('is_ad', is_ad);
+      fd.append('name', name.trim());
+      fd.append('brand', brand.trim());
+      fd.append('compatible_models', compatibleModels.trim());
+      fd.append('price', String(Number(price)));
+      fd.append('condition', condition);
       fd.append('description', description.trim());
-      fd.append('year', condition === 'ads' ? '2024' : String(Number(year)));
-      fd.append('km_driven', condition === 'ads' ? '1' : String(Number(kmDriven)));
-      fd.append('ownership', (condition === 'ads' || condition === 'new') ? '1' : String(Number(ownership)));
-      fd.append('price', condition === 'ads' ? '1' : String(Number(price)));
-      fd.append('insurance', insurance ? 'true' : 'false');
+      fd.append('is_available', isAvailable ? 'true' : 'false');
       
       files.forEach((f, index) => {
         fd.append(`image_${index + 1}`, f.file);
       });
 
       setIsUploading(true);
-      await createBike(fd);
+      await createSparePart(fd);
       setUploadComplete(true);
-      toast.success('Bike added successfully!');
+      toast.success('Spare part added successfully!');
     } catch (err) {
       console.error(err);
-      const msg = err instanceof Error ? err.message : 'Failed to save bike.';
+      const msg = err instanceof Error ? err.message : 'Failed to save spare part.';
       setError(msg);
       toast.error(msg);
     } finally {
@@ -155,9 +137,9 @@ export default function AdminAddBike() {
               className="text-4xl font-bold text-white mb-2" 
               style={{ fontFamily: "'Noto Serif', serif" }}
             >
-              Add New Listing
+              Add Spare Part
             </h1>
-            <p className="text-gray-400">Expand your inventory with a new bike model or advertisement slot.</p>
+            <p className="text-gray-400">List a new genuine spare part in the inventory.</p>
           </div>
         </div>
 
@@ -166,7 +148,7 @@ export default function AdminAddBike() {
             <CardHeader className="border-b border-white/5 pb-8">
               <CardTitle className="text-2xl flex items-center gap-3 text-white" style={{ fontFamily: "'Noto Serif', serif" }}>
                 <Info className="w-6 h-6 text-[#f7931e]" />
-                Primary Specifications
+                Primary Details
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-8 space-y-6">
@@ -179,123 +161,85 @@ export default function AdminAddBike() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="make" className="text-gray-300">Manufacturer (Make)</Label>
+                  <Label htmlFor="name" className="text-gray-300">Part Name</Label>
                   <Input 
-                    id="make" 
-                    value={make} 
-                    onChange={(e) => setMake(e.target.value)} 
-                    disabled={condition === 'ads'} 
-                    placeholder="e.g. Royal Enfield"
+                    id="name" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    placeholder="e.g. Front Brake Pads"
                     className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="modelName" className="text-gray-300">Model Name</Label>
+                  <Label htmlFor="brand" className="text-gray-300">Brand</Label>
                   <Input 
-                    id="modelName" 
-                    value={modelName} 
-                    onChange={(e) => setModelName(e.target.value)} 
-                    placeholder="e.g. Classic 350"
+                    id="brand" 
+                    value={brand} 
+                    onChange={(e) => setBrand(e.target.value)} 
+                    placeholder="e.g. Brembo"
                     className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="condition" className="text-gray-300">Listing Category</Label>
+                  <Label htmlFor="compatibleModels" className="text-gray-300">Compatible Models</Label>
+                  <Input 
+                    id="compatibleModels" 
+                    value={compatibleModels} 
+                    onChange={(e) => setCompatibleModels(e.target.value)} 
+                    placeholder="e.g. Ninja 300, RC 390"
+                    className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="price" className="text-gray-300">Price (INR)</Label>
+                  <Input 
+                    id="price" 
+                    type="number"
+                    value={price} 
+                    onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))} 
+                    placeholder="e.g. 1500"
+                    className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="condition" className="text-gray-300">Condition</Label>
                   <select
                     id="condition"
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
                     className="flex h-10 w-full rounded-md border border-white/10 bg-neutral-800/50 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-[#f7931e]/50 outline-none transition-all"
                   >
-                    <option value="new">New Arrival</option>
-                    <option value="old">Pre-Owned</option>
-                    <option value="ads">Advertisement Spot</option>
+                    <option value="New">New</option>
+                    <option value="Refurbished">Refurbished</option>
+                    <option value="Used">Used</option>
                   </select>
                 </div>
 
                 <div className="flex items-end pb-2">
                   <div className="flex items-center gap-3 bg-neutral-800/30 p-2.5 rounded-lg border border-white/5 w-full">
                     <Checkbox 
-                      id="insurance" 
-                      checked={insurance} 
-                      onChange={(e) => setInsurance(e.target.checked)} 
-                      disabled={condition === 'ads'} 
+                      id="isAvailable" 
+                      checked={isAvailable} 
+                      onChange={(e) => setIsAvailable(e.target.checked)} 
                       className="border-white/20 data-[state=checked]:bg-[#f7931e] data-[state=checked]:border-[#f7931e]"
                     />
-                    <Label htmlFor="insurance" className="mb-0 text-gray-300 cursor-pointer">Valid Insurance Included</Label>
+                    <Label htmlFor="isAvailable" className="mb-0 text-gray-300 cursor-pointer">In Stock & Available</Label>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-gray-300">Technical Description & Notes</Label>
+                <Label htmlFor="description" className="text-gray-300">Description</Label>
                 <textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Provide detailed information about the bike's history, condition, and special features..."
-                  className="flex w-full rounded-md border border-white/10 bg-neutral-800/50 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-[#f7931e]/50 outline-none transition-all min-h-[120px]"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-neutral-900/50 backdrop-blur-md border-white/10 shadow-2xl ring-1 ring-white/5 overflow-hidden">
-            <CardHeader className="border-b border-white/5 pb-8">
-              <CardTitle className="text-2xl flex items-center gap-3 text-white" style={{ fontFamily: "'Noto Serif', serif" }}>
-                <Settings2 className="w-6 h-6 text-[#f7931e]" />
-                Technical Attributes
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="year" className="text-gray-300">Manufacturing Year</Label>
-                <Input 
-                  id="year" 
-                  type="number" 
-                  value={year} 
-                  onChange={(e) => setYear(e.target.value === '' ? '' : Number(e.target.value))} 
-                  disabled={condition === 'ads'} 
-                  placeholder="2023"
-                  className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="kmDriven" className="text-gray-300">Total KM Driven</Label>
-                <Input 
-                  id="kmDriven" 
-                  type="number" 
-                  value={kmDriven} 
-                  onChange={(e) => setKmDriven(e.target.value === '' ? '' : Number(e.target.value))} 
-                  disabled={condition === 'ads'} 
-                  placeholder="0"
-                  className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="ownership" className="text-gray-300">Number of Owners</Label>
-                <Input 
-                  id="ownership" 
-                  type="number" 
-                  value={ownership} 
-                  onChange={(e) => setOwnership(e.target.value === '' ? '' : Number(e.target.value))} 
-                  disabled={condition === 'ads' || condition === 'new'} 
-                  placeholder="1"
-                  className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="price" className="text-gray-300">Price (INR)</Label>
-                <Input 
-                  id="price" 
-                  type="number" 
-                  value={price} 
-                  onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))} 
-                  disabled={condition === 'ads'} 
-                  placeholder="Price in ₹"
-                  className="bg-neutral-800/50 border-white/10 text-white focus:border-[#f7931e]/50 font-semibold"
+                  placeholder="Detailed description of the part, warranty info, etc..."
+                  className="flex w-full rounded-md border border-white/10 bg-neutral-800/50 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-[#f7931e]/50 outline-none transition-all min-h-[100px]"
                 />
               </div>
             </CardContent>
@@ -305,7 +249,7 @@ export default function AdminAddBike() {
             <CardHeader className="border-b border-white/5 pb-8">
               <CardTitle className="text-2xl flex items-center gap-3 text-white" style={{ fontFamily: "'Noto Serif', serif" }}>
                 <Camera className="w-6 h-6 text-[#f7931e]" />
-                Visual Media Portfolio
+                Images
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-8 space-y-6">
@@ -343,10 +287,10 @@ export default function AdminAddBike() {
                   <div>
                     <p className="text-white font-medium text-lg">Click to upload or drag & drop</p>
                     <p className="text-gray-400 text-sm mt-1">
-                      High-quality JPG/PNG (Up to 5MB each)
+                      JPG/PNG (Up to 5MB each)
                     </p>
                     <p className="text-xs text-[#f7931e]/70 mt-2 font-medium">
-                      Maximum Capacity: {MAX_FILES} {MAX_FILES === 1 ? 'image' : 'images'}
+                      Maximum Capacity: {MAX_FILES} images
                     </p>
                   </div>
                   <div className="flex gap-3 mt-2">
@@ -374,10 +318,10 @@ export default function AdminAddBike() {
               {files.length > 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Media Selection ({files.length}/{MAX_FILES})</h4>
+                    <h4 className="text-sm font-semibold uppercase tracking-wider text-gray-400">Selected Images ({files.length}/{MAX_FILES})</h4>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     {files.map((f) => (
                       <div key={f.id} className="relative group aspect-square rounded-xl overflow-hidden bg-neutral-800 ring-1 ring-white/10">
                         <img src={f.preview || ''} alt="preview" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
@@ -414,16 +358,16 @@ export default function AdminAddBike() {
               {isUploading ? (
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Synchronizing Asset...
+                  Uploading...
                 </div>
-              ) : isSubmitting ? 'Finalizing Profile...' : 'Authorize & List Bike'}
+              ) : isSubmitting ? 'Saving...' : 'List Spare Part'}
             </Button>
             <Button 
               variant="ghost" 
               onClick={() => navigate('/admin')}
               className="h-14 px-8 text-gray-400 hover:text-white"
             >
-              Discard Changes
+              Cancel
             </Button>
           </div>
         </form>
@@ -437,26 +381,26 @@ export default function AdminAddBike() {
                   <CheckCircle2 className="w-12 h-12 text-green-400" />
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>
-                  Profile Initialized
+                  Spare Part Added
                 </h3>
-                <p className="text-gray-400 mb-8">Your bike and media assets have been successfully synchronized with the platform inventory.</p>
+                <p className="text-gray-400 mb-8">The spare part has been successfully added to the inventory.</p>
                 
                 <div className="flex flex-col gap-3 w-full">
                   <Button 
                     className="w-full bg-[#f7931e] hover:bg-[#e0821a] text-white font-bold h-12"
                     onClick={() => {
-                      setMake(''); setModelName(''); setYear(''); setKmDriven(''); setOwnership(''); setPrice(''); setInsurance(false);
+                      setName(''); setBrand(''); setCompatibleModels(''); setPrice(''); setCondition('New'); setDescription(''); setIsAvailable(true);
                       setFiles([]); setUploadComplete(false);
                     }}
                   >
-                    Register Another Model
+                    Add Another Part
                   </Button>
                   <Button 
                     variant="outline" 
                     className="w-full border-white/10 text-white h-12"
                     onClick={() => navigate('/admin')}
                   >
-                    Return to Control Center
+                    Return to Dashboard
                   </Button>
                 </div>
               </div>
@@ -482,4 +426,3 @@ export default function AdminAddBike() {
     </div>
   );
 }
-

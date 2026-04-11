@@ -18,7 +18,11 @@ import VerifyOTP from '@/pages/VerifyOTP'
 import Admin from '@/pages/Admin'
 import AdminAddBike from '@/pages/AdminAddBike'
 import AdminUsers from '@/pages/AdminUsers'
+import AdminParts from '@/pages/AdminParts'
+import AdminAddPart from '@/pages/AdminAddPart'
 import BikeDetails from '@/pages/BikeDetails'
+import PartDetails from '@/pages/PartDetails'
+import Insurance from '@/pages/Insurance'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import '@/App.css'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
@@ -27,7 +31,8 @@ function App() {
   const location = useLocation();
   const shouldShowFooter = location.pathname === '/' || location.pathname === '/about';
   const isBikeDetails = location.pathname.startsWith('/buy/') && location.pathname.length > 5;
-  const shouldShowNavbar = !isBikeDetails;
+  const isPartDetails = location.pathname.startsWith('/parts/') && location.pathname.split('/').length === 3;
+  const shouldShowNavbar = !isBikeDetails && !isPartDetails;
 
   return (
     <ThemeProvider>
@@ -47,10 +52,14 @@ function App() {
                 <Route path="/buy" element={<ProtectedRoute><Buy /></ProtectedRoute>} />
                 <Route path="/sell" element={<ProtectedRoute><Sell /></ProtectedRoute>} />
                 <Route path="/parts" element={<ProtectedRoute><Parts /></ProtectedRoute>} />
+                <Route path="/parts/:id" element={<ProtectedRoute><PartDetails /></ProtectedRoute>} />
                 <Route path="/about" element={<About />} />
-                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                <Route path="/admin/add-bike" element={<ProtectedRoute><AdminAddBike /></ProtectedRoute>} />
-                <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
+                <Route path="/admin/add-bike" element={<ProtectedRoute adminOnly><AdminAddBike /></ProtectedRoute>} />
+                <Route path="/admin/add-part" element={<ProtectedRoute adminOnly><AdminAddPart /></ProtectedRoute>} />
+                <Route path="/admin/parts" element={<ProtectedRoute adminOnly><AdminParts /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
+                <Route path="/insurance" element={<ProtectedRoute><Insurance /></ProtectedRoute>} />
                 <Route path="/buy/:id" element={<ProtectedRoute><BikeDetails /></ProtectedRoute>} />
               </Routes>
             </ErrorBoundary>

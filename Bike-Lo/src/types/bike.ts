@@ -12,7 +12,7 @@ export interface Bike {
   location: string;
   tags: string[];
   imageUrl: string;
-  isAd: boolean;
+  isAd?: boolean;
   description?: string;
 }
 

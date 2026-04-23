@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Star, Phone } from "lucide-react";
 import mock3 from "@/assets/Hero-Image.webp";
 import { Link } from "react-router-dom";
 
@@ -122,6 +122,24 @@ export default function Hero() {
               >
                 Download App
               </Button>
+            </motion.div>
+
+            {/* Contact Us Button */}
+            <motion.div
+              className="flex justify-center lg:justify-start"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.75, ease: 'easeInOut' }}
+            >
+              <a href="tel:7396961812">
+                <Button
+                  className="hero-btn bg-white dark:bg-neutral-800 text-[#f7931e] border-2 border-[#f7931e] font-bold px-8 py-6 text-lg rounded-md hover:scale-105 transition-transform duration-300 flex items-center gap-2"
+                  style={{ fontFamily: "'Noto Serif', serif" }}
+                >
+                  <Phone size={20} />
+                  Contact Us: 7396961812
+                </Button>
+              </a>
             </motion.div>
 
             {/* Social Proof Section */}

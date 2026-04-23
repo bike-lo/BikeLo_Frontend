@@ -107,7 +107,7 @@ export default function Footer() {
             <div className="footer-cta">
               <Button className="cta-call">
                 <Phone size={18} />
-                8790552452
+                7396961812
               </Button>
               <Button variant="outline" className="cta-outline">
                 Get Instant Quotes

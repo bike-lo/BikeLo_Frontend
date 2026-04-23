@@ -23,13 +23,17 @@ import AdminAddPart from '@/pages/AdminAddPart'
 import BikeDetails from '@/pages/BikeDetails'
 import PartDetails from '@/pages/PartDetails'
 import Insurance from '@/pages/Insurance'
+import Locations from '@/pages/Locations'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import '@/App.css'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 function App() {
   const location = useLocation();
-  const shouldShowFooter = location.pathname === '/' || location.pathname === '/about';
+  const shouldShowFooter =
+    location.pathname === '/' ||
+    location.pathname === '/about' ||
+    location.pathname === '/locations';
   const isBikeDetails = location.pathname.startsWith('/buy/') && location.pathname.length > 5;
   const isPartDetails = location.pathname.startsWith('/parts/') && location.pathname.split('/').length === 3;
   const shouldShowNavbar = !isBikeDetails && !isPartDetails;
@@ -54,6 +58,7 @@ function App() {
                 <Route path="/parts" element={<ProtectedRoute><Parts /></ProtectedRoute>} />
                 <Route path="/parts/:id" element={<ProtectedRoute><PartDetails /></ProtectedRoute>} />
                 <Route path="/about" element={<About />} />
+                <Route path="/locations" element={<Locations />} />
                 <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
                 <Route path="/admin/add-bike" element={<ProtectedRoute adminOnly><AdminAddBike /></ProtectedRoute>} />
                 <Route path="/admin/add-part" element={<ProtectedRoute adminOnly><AdminAddPart /></ProtectedRoute>} />

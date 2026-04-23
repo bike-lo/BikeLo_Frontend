@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -22,6 +22,7 @@ import {
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { resolvedTheme, setTheme } = useTheme();
@@ -60,16 +61,28 @@ export default function Navbar() {
     { to: "/about", label: "About Us" },
   ];
 
-  // Show nav links when authenticated; add Admin link for admin role.
-  const visibleNavLinks = isAuthenticated
-    ? (() => {
-      const base = [...navLinks];
-      if (user && user.role === "admin") {
-        base.push({ to: "/admin", label: "Admin" });
-      }
-      return base;
-    })()
-    : [];
+  const visibleNavLinks = (() => {
+    const base = [...navLinks];
+    if (user && user.role === "admin") {
+      base.push({ to: "/admin", label: "Admin" });
+    }
+    return base;
+  })();
+
+  const handleProtectedNavigation = (path: string) => {
+    if (isAuthenticated) {
+      navigate(path);
+      return;
+    }
+
+    navigate("/login", {
+      state: {
+        from: {
+          pathname: path,
+        },
+      },
+    });
+  };
 
   return (
     <nav
@@ -96,30 +109,29 @@ export default function Navbar() {
           </div>
 
           {/* Center: Navigation Links (Desktop) */}
-          {visibleNavLinks.length > 0 && (
-            <div className="hidden md:flex flex-1 items-center justify-center absolute left-1/2 transform -translate-x-1/2 z-0">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  {visibleNavLinks.map((link) => (
-                    <NavigationMenuItem key={link.to}>
-                      <Link
-                        to={link.to}
-                        className={cn(
-                          "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-[15px] font-bold transition-colors hover:text-[#f7931e] focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-                          isActive(link.to)
-                            ? "text-[#f7931e]"
-                            : resolvedTheme === 'dark' ? "text-white" : "text-black"
-                        )}
-                        style={{ fontFamily: "'Noto Serif', serif" }}
-                      >
-                        {link.label}
-                      </Link>
-                    </NavigationMenuItem>
-                  ))}
-                </NavigationMenuList>
-              </NavigationMenu>
-            </div>
-          )}
+          <div className="hidden md:flex flex-1 items-center justify-center absolute left-1/2 transform -translate-x-1/2 z-0">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {visibleNavLinks.map((link) => (
+                  <NavigationMenuItem key={link.to}>
+                    <button
+                      type="button"
+                      onClick={() => handleProtectedNavigation(link.to)}
+                      className={cn(
+                        "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-[15px] font-bold transition-colors hover:text-[#f7931e] focus:outline-none disabled:pointer-events-none disabled:opacity-50",
+                        isActive(link.to)
+                          ? "text-[#f7931e]"
+                          : resolvedTheme === 'dark' ? "text-white" : "text-black"
+                      )}
+                      style={{ fontFamily: "'Noto Serif', serif" }}
+                    >
+                      {link.label}
+                    </button>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
 
           {/* Right: Auth Buttons / Profile / Theme Toggle (Desktop) */}
           <div className="hidden md:flex flex-shrink-0 items-center gap-3 ml-auto z-10">
@@ -222,11 +234,12 @@ export default function Navbar() {
                 <div className="flex flex-col gap-4 py-8">
                   <nav className="flex flex-col gap-2">
                     {visibleNavLinks.map((link) => (
-                      <Link
+                      <button
                         key={link.to}
-                        to={link.to}
+                        type="button"
+                        onClick={() => handleProtectedNavigation(link.to)}
                         className={cn(
-                          "px-4 py-3 rounded-md text-lg font-bold transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
+                          "px-4 py-3 rounded-md text-left text-lg font-bold transition-colors hover:bg-gray-100 dark:hover:bg-gray-800",
                           isActive(link.to)
                             ? "text-[#f7931e] bg-orange-50 dark:bg-orange-900/20"
                             : resolvedTheme === 'dark' ? "text-white" : "text-black"
@@ -234,7 +247,7 @@ export default function Navbar() {
                         style={{ fontFamily: "'Noto Serif', serif" }}
                       >
                         {link.label}
-                      </Link>
+                      </button>
                     ))}
                   </nav>
 
@@ -287,4 +300,3 @@ export default function Navbar() {
     </nav>
   );
 }
-

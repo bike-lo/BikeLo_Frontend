@@ -10,6 +10,8 @@ import logoLight from '@/assets/logo-light.png';
 
 export default function Auth() {
   const location = useLocation();
+  const redirectPath =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/';
   const [isSignUp, setIsSignUp] = useState(location.pathname === '/signup');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,7 +47,7 @@ export default function Auth() {
     setIsLoading(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');
     } finally {

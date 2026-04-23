@@ -1,5 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect, useCallback } from "react";
-import { useLocation } from "react-router-dom";
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
 interface LoadingContextType {
   isLoading: boolean;
@@ -12,7 +11,6 @@ const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 export function LoadingProvider({ children }: { children: ReactNode }) {
   const [loadingTasks, setLoadingTasks] = useState(0);
   const isLoading = loadingTasks > 0;
-  const location = useLocation();
 
   const startLoading = useCallback(() => setLoadingTasks(prev => prev + 1), []);
   const stopLoading = useCallback(() => setLoadingTasks(prev => Math.max(0, prev - 1)), []);

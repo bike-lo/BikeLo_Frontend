@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Package, Hammer, ShoppingCart, Trash2, ShieldCheck, Clock, Edit2, X, Plus } from "lucide-react";
+import { ArrowLeft, Package, Hammer, Trash2, ShieldCheck, Clock, Edit2, X, Plus } from "lucide-react";
 import { getSpareParts, sparePartImageUrl, deleteSparePart, updateSparePart } from "@/services/sparePartService";
 import { useAuth } from "@/hooks/use-auth";
 import { useLoading } from "@/hooks/use-loading";

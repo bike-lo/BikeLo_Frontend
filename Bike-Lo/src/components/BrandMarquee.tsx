@@ -3,7 +3,7 @@ import HondaLogo from "@/assets/HondaLogo.webp";
 import SuzukiLogo from "@/assets/SuzukiLogo.webp";
 import YamahaLogo from "@/assets/YamahaLogo.webp";
 import BajajLogo from "@/assets/Bajaj_Logo.webp";
-import RoyalEnfieldLogo from "@/assets/Royal_Logo.webp";
+import RoyalEnfieldLogo from "@/assets/Royal_logo.webp";
 import JawaLogo from "@/assets/jawa_logo.webp";
 import YezdiLogo from "@/assets/yezdi.webp";
 import TriumphLogo from "@/assets/Triumph.webp";

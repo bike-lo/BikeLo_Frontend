@@ -77,7 +77,7 @@ export default function Footer() {
             </p>
 
             <p className="footer-disclaimer">
-              (*)subject to certain terms and conditions.
+              (*)subject to certain <Link to="/terms" className="underline hover:text-[#f7931e]">terms and conditions</Link>.
             </p>
 
             {/* Social Icons */}

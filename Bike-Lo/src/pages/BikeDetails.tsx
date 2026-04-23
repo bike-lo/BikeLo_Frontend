@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { getBikes, bikeImageUrl, bookBikeLeadApi, updateBike, updateBikeFormData, deleteBike } from "@/services/bikeService";
 import { meApi } from "@/services/authService";
 import { useAuth } from "@/hooks/use-auth";
+import { useLoading } from "@/hooks/use-loading";
 import type { BikeResponse, UpdateBikeRequest } from "@/types/api";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Edit2, Trash2, X } from "lucide-react";
@@ -18,6 +19,7 @@ export default function BikeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const isAdmin = user?.role === "admin";
 
   const [bike, setBike] = useState<BikeResponse | null>(null);
@@ -37,6 +39,7 @@ export default function BikeDetails() {
 
   useEffect(() => {
     let mounted = true;
+    startLoading();
     setLoading(true);
     const decodedId = id ? decodeURIComponent(id) : id;
     getBikes()
@@ -56,7 +59,10 @@ export default function BikeDetails() {
         if (mounted) setError("Failed to load bike details");
       })
       .finally(() => {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+          stopLoading();
+        }
       });
     return () => { mounted = false; };
   }, [id]);
@@ -220,16 +226,9 @@ export default function BikeDetails() {
     if (newItems.length) setEditFiles((prev) => [...prev, ...newItems]);
   };
 
-  // ── Loading ──────────────────────────────────────────────────────────────
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#f7931e]/30 border-t-[#f7931e] rounded-full animate-spin" />
-          <p className="text-neutral-400 text-sm uppercase tracking-widest font-semibold">Loading...</p>
-        </div>
-      </div>
-    );
+  // ── Loading (Global loading screen handles this) ─────────────────────────
+  if (loading && !bike) {
+    return <div className="min-h-screen bg-black" />;
   }
 
   // ── Error ─────────────────────────────────────────────────────────────────
@@ -437,12 +436,13 @@ export default function BikeDetails() {
                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                 </button>
                 
-                <button
-                  className="py-6 bg-neutral-900/50 border border-white/10 text-white font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-neutral-800 transition-all active:scale-[0.98]"
+                <a
+                  href="tel:7396961812"
+                  className="py-6 bg-neutral-900/50 border border-white/10 text-white font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-neutral-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                   style={{ fontFamily: "'Noto Serif', serif" }}
                 >
-                  Configure Financing
-                </button>
+                  Contact Us: 7396961812
+                </a>
               </div>
 
               {/* Administrative Intel (Admin Only) */}

@@ -187,7 +187,7 @@ export default function Auth() {
                     className="text-3xl md:text-4xl font-bold mb-3 text-white"
                     style={{ fontFamily: "'Noto Serif', serif" }}
                   >
-                    {isSignUp ? 'Welcome Back!' : 'Hello, Friend!'}
+                    {isSignUp ? 'Welcome Back!' : 'Hello, Rider!'}
                   </h2>
                   <p className="text-white/80 mb-8 text-base leading-relaxed max-w-xs mx-auto">
                     {isSignUp
@@ -250,9 +250,9 @@ export default function Auth() {
                       disabled={isLoading}
                       className="h-11"
                     />
-                  {fieldErrors.email && (
-                    <p className="text-sm text-destructive mt-1">{fieldErrors.email}</p>
-                  )}
+                    {fieldErrors.email && (
+                      <p className="text-sm text-destructive mt-1">{fieldErrors.email}</p>
+                    )}
                   </motion.div>
 
                   <motion.div className="space-y-2" variants={itemVariants}>
@@ -267,9 +267,9 @@ export default function Auth() {
                       disabled={isLoading}
                       className="h-11"
                     />
-                  {fieldErrors.password && (
-                    <p className="text-sm text-destructive mt-1">{fieldErrors.password}</p>
-                  )}
+                    {fieldErrors.password && (
+                      <p className="text-sm text-destructive mt-1">{fieldErrors.password}</p>
+                    )}
                   </motion.div>
 
                   <motion.div className="text-right" variants={itemVariants}>

@@ -39,8 +39,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const USER_STORAGE_KEY = "bikelo_user";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem(USER_STORAGE_KEY);
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isLoading, setIsLoading] = useState(() => {
+    // Only show global loader if we don't have a cached user but have an access token
+    const token = localStorage.getItem("bikelo_access_token");
+    const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+    return !!token && !savedUser;
+  });
 
   const refreshUser = useCallback(async () => {
     try {
@@ -98,6 +110,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, []);
+  
+  // Failsafe: Ensure auth loading doesn't block the app for too long
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 2000); // 2-second failsafe
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   const login = async (email: string, password: string) => {
     const tokens = await loginApi(email, password);

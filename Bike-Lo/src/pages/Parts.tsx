@@ -7,8 +7,10 @@ import PartGrid from "@/components/PartGrid";
 import BenefitsSection from "@/components/BenefitsSection";
 import { getSpareParts } from "@/services/sparePartService";
 import type { SparePartResponse } from "@/types/api";
+import { useLoading } from "@/hooks/use-loading";
 
 export default function Parts() {
+  const { startLoading, stopLoading } = useLoading();
   const [parts, setParts] = useState<SparePartResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,6 +20,7 @@ export default function Parts() {
 
   useEffect(() => {
     let mounted = true;
+    startLoading();
     getSpareParts()
       .then((data) => {
         if (!mounted) return;
@@ -32,11 +35,15 @@ export default function Parts() {
         if (msg.includes("Unauthorized") || msg.includes("Invalid") || msg.includes("expired")) {
           navigate("/login", { replace: true });
         }
+      })
+      .finally(() => {
+        if (mounted) stopLoading();
       });
     return () => {
       mounted = false;
+      stopLoading(); // Ensure cleanup if unmounted before fetch completes
     };
-  }, [navigate]);
+  }, [navigate, startLoading, stopLoading]);
 
   const brands = useMemo(() => {
     const b = new Set(parts.map(p => p.brand));
@@ -58,15 +65,8 @@ export default function Parts() {
     });
   }, [parts, searchQuery, selectedBrand, selectedCondition]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#f7931e]/20 border-t-[#f7931e] rounded-full animate-spin" />
-          <p className="text-[#f7931e] font-black uppercase tracking-widest text-xs">Accessing Inventory...</p>
-        </div>
-      </div>
-    );
+  if (loading && parts.length === 0) {
+    return <div className="min-h-screen bg-black" />;
   }
 
   return (

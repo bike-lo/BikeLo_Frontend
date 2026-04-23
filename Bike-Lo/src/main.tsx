@@ -5,10 +5,20 @@ import './index.css'
 import './mobile.css'
 import App from './App.tsx'
 
+import { LoadingProvider } from '@/hooks/use-loading'
+import { AuthProvider } from '@/hooks/use-auth'
+import { ThemeProvider } from '@/hooks/use-theme'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <ThemeProvider>
+        <AuthProvider>
+          <LoadingProvider>
+            <App />
+          </LoadingProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,
 )

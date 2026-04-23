@@ -2,30 +2,79 @@ import TvsLogo from "@/assets/TvsLogo.webp";
 import HondaLogo from "@/assets/HondaLogo.webp";
 import SuzukiLogo from "@/assets/SuzukiLogo.webp";
 import YamahaLogo from "@/assets/YamahaLogo.webp";
+import BajajLogo from "@/assets/Bajaj_Logo.webp";
+import RoyalEnfieldLogo from "@/assets/Royal_Logo.webp";
+import JawaLogo from "@/assets/jawa_logo.webp";
+import YezdiLogo from "@/assets/yezdi.webp";
+import TriumphLogo from "@/assets/Triumph.webp";
+import BmwLogo from "@/assets/bmw_logo.webp";
+import ChetakLogo from "@/assets/chetak_logo.webp";
+import AtherLogo from "@/assets/Ather-logo.svg.webp"
 
 export default function BrandMarquee() {
-  // Partner logos array with local image files
+  // Partner logos array with local image files 
   const partners = [
-    { 
-      id: 1, 
+    {
+      id: 1,
       src: TvsLogo,
       alt: "TVS Logo"
     },
-    { 
-      id: 5, 
+    {
+      id: 2,
       src: HondaLogo,
       alt: "Honda Logo"
     },
-    { 
-      id: 6, 
+    {
+      id: 3,
       src: SuzukiLogo,
       alt: "Suzuki Logo"
     },
-    { 
-      id: 7, 
+    {
+      id: 4,
       src: YamahaLogo,
       alt: "Yamaha Logo"
     },
+    {
+      id: 5,
+      src: BajajLogo,
+      alt: "Bajaj Logo"
+    },
+    {
+      id: 6,
+      src: RoyalEnfieldLogo,
+      alt: "Royal Enfield Logo"
+    },
+    {
+      id: 7,
+      src: JawaLogo,
+      alt: "Jawa Logo"
+    },
+    {
+      id: 8,
+      src: YezdiLogo,
+      alt: "Yezdi Logo"
+    },
+    {
+      id: 9,
+      src: TriumphLogo,
+      alt: "Triumph Logo"
+    },
+    {
+      id: 10,
+      src: BmwLogo,
+      alt: "Bmw Logo"
+    },
+    {
+      id: 11,
+      src: ChetakLogo,
+      alt: "Chetak Logo"
+    },
+    {
+      id: 12,
+      src: AtherLogo,
+      alt: "Ather Logo"
+    }
+
   ];
 
   return (
@@ -42,8 +91,8 @@ export default function BrandMarquee() {
             {/* First set of logos */}
             {partners.map((partner, index) => (
               <li key={`first-${partner.id}-${index}`} className="client-item">
-                <img 
-                  src={partner.src} 
+                <img
+                  src={partner.src}
                   alt={partner.alt}
                   className="client-logo"
                 />
@@ -52,8 +101,8 @@ export default function BrandMarquee() {
             {/* Duplicate set for seamless loop */}
             {partners.map((partner, index) => (
               <li key={`second-${partner.id}-${index}`} className="client-item">
-                <img 
-                  src={partner.src} 
+                <img
+                  src={partner.src}
                   alt={partner.alt}
                   className="client-logo"
                 />

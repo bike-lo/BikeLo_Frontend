@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Package, Hammer, ShoppingCart, Trash2, ShieldCheck, Clock, Edit2, X, Plus } from "lucide-react";
 import { getSpareParts, sparePartImageUrl, deleteSparePart, updateSparePart } from "@/services/sparePartService";
 import { useAuth } from "@/hooks/use-auth";
+import { useLoading } from "@/hooks/use-loading";
 import type { SparePartResponse, UpdateSparePartRequest } from "@/types/api";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ export default function PartDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const isAdmin = user?.role === "admin";
 
   const [part, setPart] = useState<SparePartResponse | null>(null);
@@ -37,6 +39,7 @@ export default function PartDetails() {
   useEffect(() => {
     let mounted = true;
     if (!id) return;
+    startLoading();
     setLoading(true);
     getSpareParts()
       .then((data: SparePartResponse[]) => {
@@ -56,7 +59,10 @@ export default function PartDetails() {
         if (mounted) setError("Failed to synchronize with inventory server.");
       })
       .finally(() => {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+          stopLoading();
+        }
       });
     return () => { mounted = false; };
   }, [id]);
@@ -178,15 +184,9 @@ export default function PartDetails() {
     if (newItems.length) setEditFiles((prev) => [...prev, ...newItems]);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center pt-20">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#f7931e]/30 border-t-[#f7931e] rounded-full animate-spin" />
-          <p className="text-neutral-400 text-[10px] uppercase tracking-[0.4em] font-black">Syncing Data...</p>
-        </div>
-      </div>
-    );
+  // ── Loading (Global loading screen handles this) ─────────────────────────
+  if (loading && !part) {
+    return <div className="min-h-screen bg-black" />;
   }
 
   if (error || !part) {
@@ -383,10 +383,18 @@ export default function PartDetails() {
                  style={{ fontFamily: "'Noto Serif', serif" }}
                >
                  <span className="flex items-center justify-center gap-3">
-                   <ShoppingCart className="w-4 h-4" />
+                   <Package className="w-4 h-4" />
                    {part.is_available ? 'Acquire Hardware' : 'Reservation Not Possible'}
                  </span>
                </button>
+
+               <a
+                 href="tel:7396961812"
+                 className="w-full py-6 bg-neutral-900/50 border border-white/10 text-white font-black uppercase tracking-[0.3em] text-xs rounded-2xl hover:bg-neutral-800 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                 style={{ fontFamily: "'Noto Serif', serif" }}
+               >
+                 Contact Support: 7396961812
+               </a>
 
                {isAdmin && (
                  <div className="grid grid-cols-2 gap-4 pt-8">

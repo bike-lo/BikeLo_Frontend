@@ -5,8 +5,10 @@ import BikeGrid from "@/components/BikeGrid";
 import BenefitsSection from "@/components/BenefitsSection";
 import { getBikes, mapBikeResponseToBike } from "@/services/bikeService";
 import type { Bike } from "@/types/bike";
+import { useLoading } from "@/hooks/use-loading";
 
 export default function Buy() {
+  const { startLoading, stopLoading } = useLoading();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 3]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -51,6 +53,7 @@ export default function Buy() {
   // Fetch bikes from API (requires auth)
   useEffect(() => {
     let mounted = true;
+    startLoading();
     getBikes()
       .then((data) => {
         if (!mounted) return;
@@ -64,11 +67,15 @@ export default function Buy() {
         if (msg.includes("Unauthorized") || msg.includes("Invalid") || msg.includes("expired")) {
           navigate("/login", { replace: true });
         }
+      })
+      .finally(() => {
+        if (mounted) stopLoading();
       });
     return () => {
       mounted = false;
+      stopLoading(); // Ensure cleanup if unmounted before fetch completes
     };
-  }, [navigate]);
+  }, [navigate, startLoading, stopLoading]);
 
   // Filter bikes based on all criteria
   const filteredBikes = useMemo(() => {

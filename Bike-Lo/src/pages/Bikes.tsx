@@ -5,8 +5,10 @@ import BikeGrid from "@/components/BikeGrid";
 import BenefitsSection from "@/components/BenefitsSection";
 import { getBikes, mapBikeResponseToBike } from "@/services/bikeService";
 import type { Bike } from "@/types/bike";
+import { useLoading } from "@/hooks/use-loading";
 
 export default function Bikes() {
+  const { startLoading, stopLoading } = useLoading();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 3]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -29,6 +31,7 @@ export default function Bikes() {
   // Fetch bikes from API (requires auth)
   useEffect(() => {
     let mounted = true;
+    startLoading();
     getBikes()
       .then((data) => {
         if (!mounted) return;
@@ -42,11 +45,14 @@ export default function Bikes() {
         if (msg.includes("Unauthorized") || msg.includes("Invalid") || msg.includes("expired")) {
           navigate("/login", { replace: true });
         }
+      })
+      .finally(() => {
+        if (mounted) stopLoading();
       });
     return () => {
       mounted = false;
     };
-  }, [navigate]);
+  }, [navigate, startLoading, stopLoading]);
 
   // Save wishlist to localStorage whenever it changes
   useEffect(() => {

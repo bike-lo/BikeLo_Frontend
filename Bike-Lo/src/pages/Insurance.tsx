@@ -40,6 +40,21 @@ export default function Insurance() {
           <SellForm />
         </div>
 
+        {/* Contact Support for Insurance */}
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 p-8 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
+          <div className="text-center sm:text-left">
+            <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Noto Serif', serif" }}>Insurance Query?</h3>
+            <p className="text-gray-400 text-sm">Talk to our insurance experts for personalized assistance.</p>
+          </div>
+          <a
+            href="tel:7396961812"
+            className="px-8 py-4 bg-neutral-900 border border-white/10 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-neutral-800 transition-all flex items-center gap-3 whitespace-nowrap"
+            style={{ fontFamily: "'Noto Serif', serif" }}
+          >
+            Contact Support: 7396961812
+          </a>
+        </div>
+
         {/* Trust Messaging */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-t border-white/5 pt-12">
           <div className="p-4 group">
